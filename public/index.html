@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¿Quién es el más Vacán? - Multijugador</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+
+    html {
+      min-height: 100%;
+      overflow-x: hidden;
+      background: linear-gradient(135deg, #7ee8e0, #8ab6f5, #a78bfa, #8ab6f5, #7ee8e0);
+      background-size: 400% 400%;
+      animation: fondoAnimado 15s ease infinite;
+    }
+    @keyframes fondoAnimado {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    body {
+      font-family: 'Fredoka', sans-serif;
+      max-width: 500px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 10px 20px 60px;
+      text-align: center;
+      background: transparent;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+
+    .mascota-vacan {
+      width: 130px;
+      height: auto;
+      display: block;
+      margin: 10px auto 0;
+      animation: flotar 3s ease-in-out infinite;
+      filter: drop-shadow(0 8px 10px rgba(0,0,0,0.15));
+    }
+    @keyframes flotar {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-14px); }
+    }
+
+    h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      color: #1e2a5e;
+      text-shadow: 0 2px 4px rgba(255,255,255,0.6);
+    }
+
+    input, select, button {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1rem;
+      padding: 10px 16px;
+      margin: 6px;
+      border-radius: 999px;
+      border: none;
+    }
+    input, select { box-shadow: inset 0 0 0 2px #ddd; }
+    button { font-weight: 600; cursor: pointer; transition: transform 0.15s ease; }
+    button:hover:not(:disabled) { transform: translateY(-2px); }
+    button:disabled { cursor: not-allowed; }
+
+    #form-union { background: #fff; padding: 20px; margin-top: 16px; border-radius: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.15); }
+
+    #lista-jugadores { list-style: none; padding: 0; }
+    #lista-jugadores li { padding: 10px 14px; background: #fff; margin: 6px 0; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    #error { color: #d92b2b; }
+
+    #categoria-actual-visible { font-weight: 600; color: #1e2a5e; margin: 10px 0; }
+
+    #panel-pregunta { display: none; margin-top: 24px; padding: 20px; background: #fffbe6; border-radius: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.15); }
+    .btn-vf { font-size: 1.2rem; padding: 14px 28px; margin: 10px; }
+    .btn-vf.verdadero { background: linear-gradient(135deg, #8ee88a, #4fc94f); color: #fff; }
+    .btn-vf.falso { background: linear-gradient(135deg, #f28e8e, #e34a4a); color: #fff; }
+    
+#botones-respuesta { position: relative; min-height: 160px; margin: 10px 0; }
+    .carta-voto {
+      position: absolute; bottom: 0; left: 50%;
+      display: flex; align-items: center; justify-content: center;
+      width: 90px; height: 130px; border-radius: 12px; font-weight: 700; font-size: 1.1rem;
+      color: #fff; cursor: grab; user-select: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.2s ease;
+    }
+    .carta-voto:active { cursor: grabbing; }
+    .carta-voto.verdadero { transform: translateX(calc(-50% - 40px)) rotate(-8deg); z-index: 1; }
+    .carta-voto.falso { transform: translateX(calc(-50% + 40px)) rotate(8deg); z-index: 2; }
+    .carta-voto.verdadero:hover { transform: translateX(calc(-50% - 40px)) translateY(-24px) rotate(0deg) scale(1.06); z-index: 10; }
+    .carta-voto.falso:hover { transform: translateX(calc(-50% + 40px)) translateY(-24px) rotate(0deg) scale(1.06); z-index: 10; }
+    .carta-voto.verdadero { background: linear-gradient(135deg, #8ee88a, #4fc94f); }
+    .carta-voto.falso { background: linear-gradient(135deg, #f28e8e, #e34a4a); }
+    .carta-voto.arrastrando { opacity: 0.35; }
+
+    #zona-mesa {
+      min-height: 110px; margin: 14px auto; padding: 10px; border-radius: 14px;
+      border: 3px dashed #bbb; display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 10px; background: rgba(255,255,255,0.4); transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    #zona-mesa.zona-activa { border-color: #7c5fe0; background: rgba(167,139,250,0.2); }
+    .carta-mesa { width: 70px; text-align: center; }
+    .carta-mesa .dorso {
+      width: 60px; height: 86px; border-radius: 8px; margin: 0 auto 4px; color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.4rem;
+      background: repeating-linear-gradient(45deg, #a78bfa, #a78bfa 6px, #8f6de0 6px, #8f6de0 12px);
+      border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .carta-mesa.revelada.correcto .dorso { background: linear-gradient(135deg, #8ee88a, #4fc94f); }
+    .carta-mesa.revelada.incorrecto .dorso { background: linear-gradient(135deg, #f28e8e, #e34a4a); }
+    .carta-mesa .nombre-mesa { font-size: 0.7rem; color: #333; }
+
+    #panel-host { display: none; margin-top: 20px; padding: 16px; background: #fff; border-radius: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.15); }
+    #selector-categoria { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 2px solid #eee; }
+    #btn-lanzar, #btn-revelar, #btn-elegir-categoria { background: linear-gradient(135deg, #a78bfa, #7c5fe0); color: #fff; }
+    #btn-lanzar:disabled, #btn-revelar:disabled { background: #ddd; color: #888; }
+
+    .resultado-correcto { color: #2e9e2e; font-weight: bold; }
+    .resultado-incorrecto { color: #d92b2b; }
+    #banner-ganador { display: none; margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #ffe699, #ffd24d); border-radius: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.2); font-size: 1.3rem; }
+    #info-jugador { display: none; margin-top: 12px; font-weight: 600; color: #1e2a5e; }
+
+    #panel-cartas { margin-top: 24px; padding: 18px; background: #f3e6ff; border-radius: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.15); }
+    .carta-item { display: inline-block; vertical-align: top; width: 170px; margin: 8px; padding: 10px; background: #fff; border-radius: 16px; border: 2px solid transparent; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+    .carta-item.seleccionada { border-color: #7a3fa0; background: #f8f0ff; }
+
+   
+    .carta-imagen { width: 100%; height: auto; max-height: 220px; object-fit: contain; border-radius: 10px; margin-bottom: 6px; }
+    .carta-nombre { font-weight: 700; margin-bottom: 4px; color: #4a2b6b; }
+    .carta-desc { font-size: 0.78rem; color: #555; line-height: 1.2; margin-bottom: 6px; }
+    .btn-jugar-esta-carta { background: #ccc; color: #888; width: 100%; margin: 0; cursor: not-allowed; }
+    .btn-jugar-esta-carta.habilitada { background: linear-gradient(135deg, #8ee88a, #4fc94f); color: #fff; cursor: pointer; }
+
+    #panel-accion { display: none; margin-top: 12px; padding: 14px; background: #fff; border: 2px dashed #a78bfa; border-radius: 16px; }
+    #accion-titulo { font-weight: 700; margin-bottom: 8px; color: #4a2b6b; }
+    .valor-opcion.color-verdadero { background: linear-gradient(135deg, #8ee88a, #4fc94f); color: #fff; }
+    .valor-opcion.color-falso { background: linear-gradient(135deg, #f28e8e, #e34a4a); color: #fff; }
+    .valor-opcion.valor-activo { outline: 3px solid #333; }
+    .valor-opcion.valor-inactiva { background: #ddd !important; color: #888 !important; }
+    #btn-jugar-carta { background: linear-gradient(135deg, #8ab6f5, #4d84e0); color: #fff; margin-top: 10px; display: block; width: 100%; }
+    #btn-jugar-carta:disabled { background: #ddd; color: #888; cursor: not-allowed; }
+
+    #log-cartas { margin-top: 16px; font-size: 0.9rem; color: #444; text-align: left; background: #fff; padding: 10px 14px; border-radius: 14px; }
+    #log-cartas p { margin: 4px 0; }
+    .error-carta { color: #d92b2b; font-size: 0.9rem; }
+
+   #zona-reiniciar { display: none; margin-top: 40px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.6); }
+    .btn-reiniciar { background: linear-gradient(135deg, #f7a8a8, #e34a4a); color: #fff; }
+
+#btn-musica-flotante {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: auto; height: auto; border-radius: 999px;
+      background: linear-gradient(135deg, #a78bfa, #7c5fe0);
+      color: #fff; font-size: 1.3rem; margin-top: 20px; padding: 10px 20px;
+    }
+    #panel-musica {
+      display: none; margin: 12px auto 0; max-width: 280px;
+      background: #fff; border-radius: 16px; padding: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+    #panel-musica .track-info { font-size: 0.85rem; color: #4a2b6b; margin-bottom: 10px; min-height: 2.4em; }
+    #panel-musica .controles-musica { display: flex; justify-content: center; gap: 8px; margin-bottom: 8px; }
+    #panel-musica button { padding: 8px 12px; margin: 0; font-size: 0.9rem; }
+    #panel-musica input[type="range"] { width: 100%; margin: 6px 0 0; }
+  </style>
+</head>
+<body>
+  <img src="images/VACAN_2.png" alt="Vaquita Vacán" class="mascota-vacan">
+  <h1>¿Quién es el más Vacán?</h1>
+
+  <div id="form-union">
+    <input id="input-nombre" type="text" placeholder="Tu nombre" />
+    <select id="select-color"></select>
+    <button id="btn-unirse">Unirse</button>
+    <p id="error"></p>
+  </div>
+
+  <p id="info-jugador"></p>
+
+  <h2>Jugadores conectados</h2>
+  <ul id="lista-jugadores"></ul>
+
+  <p id="categoria-actual-visible">Categoría: sin elegir todavía</p>
+
+  <div id="banner-ganador"></div>
+
+  <div id="panel-host">
+    <div id="selector-categoria">
+      <select id="select-categoria"></select>
+      <button id="btn-elegir-categoria">Elegir categoría</button>
+      <p id="error-host" class="error-carta"></p>
+    </div>
+    <button id="btn-agregar-bot">Agregar Bot 🤖</button>
+    <button id="btn-lanzar" disabled>Lanzar pregunta</button>
+    <button id="btn-revelar" disabled>Revelar respuesta</button>
+  </div>
+
+ <div id="panel-pregunta">
+    <p id="pregunta-categoria"></p>
+    <h3 id="pregunta-texto"></h3>
+
+    <div id="zona-mesa"></div>
+
+    <div id="botones-respuesta">
+      <div class="carta-voto verdadero" id="btn-verdadero" draggable="true" data-valor="true">VERDADERO</div>
+      <div class="carta-voto falso" id="btn-falso" draggable="true" data-valor="false">FALSO</div>
+    </div>
+    <p style="font-size:0.8rem;color:#555;">Arrastra tu carta a la mesa, o simplemente tócala</p>
+    <p id="estado-respuesta"></p>
+    <div id="resultado"></div>
+  </div>
+
+  <div id="panel-cartas">
+    <h3>Tus cartas de acción</h3>
+    <div id="mis-cartas"></div>
+
+    <div id="panel-accion">
+      <p id="accion-titulo"></p>
+      <div id="accion-objetivo" style="display:none;">
+        <select id="select-objetivo"></select>
+      </div>
+      <div id="accion-valor" style="display:none;">
+        <button id="btn-valor-verdadero" class="valor-opcion color-verdadero">Verdadero</button>
+        <button id="btn-valor-falso" class="valor-opcion color-falso">Falso</button>
+      </div>
+      <button id="btn-jugar-carta" disabled>Jugar carta de acción</button>
+      <button id="btn-cancelar-carta">Cancelar</button>
+    </div>
+
+    <p id="error-carta" class="error-carta"></p>
+    <div id="log-cartas"></div>
+  </div>
+
+  <div id="zona-reiniciar">
+    <button id="btn-reiniciar" class="btn-reiniciar">Reiniciar partida</button>
+  </div>
+
+  <button id="btn-musica-flotante">🎵</button>
+  <div id="panel-musica">
+    <div class="track-info" id="musica-info">Sin música cargada</div>
+    <div class="controles-musica">
+      <button id="btn-musica-prev">⏮</button>
+      <button id="btn-musica-play">▶️</button>
+      <button id="btn-musica-next">⏭</button>
+    </div>
+    <input type="range" id="musica-volumen" min="0" max="1" step="0.05" value="0.5">
+  </div>
+  <audio id="audio-player"></audio>
+<audio id="sonido-pregunta" src="sounds/sonido_pregunta.mp3" preload="auto"></audio>
+  <audio id="sonido-revelar" src="sounds/sonido_revelar.mp3" preload="auto"></audio>
+  <audio id="sonido-carta" src="sounds/sonido_carta.mp3" preload="auto"></audio>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // ==== Reproductor de música (opcional, independiente por jugador) ====
+    const PLAYLIST = [
+      { titulo: 'El Aeropuerto', artista: 'Danny Blue Jet', archivo: 'music/cancion1.mp3' },
+      { titulo: '316', artista: 'M-Katana', archivo: 'music/cancion2.mp3' },
+      { titulo: 'Latiendoamerica', artista: 'La Concuerda', archivo: 'music/cancion3.mp3' },
+    ];
+    let indiceTrackActual = 0;
+    let sonando = false;
+
+    const btnMusicaFlotante = document.getElementById('btn-musica-flotante');
+    const panelMusica = document.getElementById('panel-musica');
+    const musicaInfo = document.getElementById('musica-info');
+    const btnMusicaPlay = document.getElementById('btn-musica-play');
+    const btnMusicaPrev = document.getElementById('btn-musica-prev');
+    const btnMusicaNext = document.getElementById('btn-musica-next');
+    const musicaVolumen = document.getElementById('musica-volumen');
+    const audioPlayer = document.getElementById('audio-player');
+
+    audioPlayer.volume = 0.5;
+
+    function cargarTrack(indice, autoplay) {
+      if (PLAYLIST.length === 0) {
+        musicaInfo.textContent = 'No hay canciones cargadas todavía';
+        return;
+      }
+      indiceTrackActual = (indice + PLAYLIST.length) % PLAYLIST.length;
+      const track = PLAYLIST[indiceTrackActual];
+      audioPlayer.src = track.archivo;
+      musicaInfo.textContent = `${track.titulo} — ${track.artista}`;
+      if (autoplay) {
+        audioPlayer.play().catch(() => {});
+        sonando = true;
+        btnMusicaPlay.textContent = '⏸';
+      }
+    }
+
+    btnMusicaFlotante.addEventListener('click', () => {
+      const abierto = panelMusica.style.display === 'block';
+      panelMusica.style.display = abierto ? 'none' : 'block';
+      if (!abierto && !audioPlayer.src) {
+        cargarTrack(0, false);
+      }
+    });
+
+    btnMusicaPlay.addEventListener('click', () => {
+      if (!audioPlayer.src) cargarTrack(0, false);
+      if (sonando) {
+        audioPlayer.pause();
+        sonando = false;
+        btnMusicaPlay.textContent = '▶️';
+      } else {
+        audioPlayer.play().catch(() => {});
+        sonando = true;
+        btnMusicaPlay.textContent = '⏸';
+      }
+    });
+
+    btnMusicaPrev.addEventListener('click', () => cargarTrack(indiceTrackActual - 1, true));
+    btnMusicaNext.addEventListener('click', () => cargarTrack(indiceTrackActual + 1, true));
+
+    audioPlayer.addEventListener('ended', () => cargarTrack(indiceTrackActual + 1, true));
+
+    musicaVolumen.addEventListener('input', () => {
+      audioPlayer.volume = parseFloat(musicaVolumen.value);
+    });
+    // ==== Fin reproductor de música ====
+// ==== Sonidos de eventos del juego ====
+    const sonidoPregunta = document.getElementById('sonido-pregunta');
+    const sonidoRevelar = document.getElementById('sonido-revelar');
+    const sonidoCarta = document.getElementById('sonido-carta');
+
+    function reproducirSonido(elemento) {
+      elemento.currentTime = 0;
+      elemento.play().catch(() => {}); // ignora el error si el navegador aún no permite audio
+    }
+    // ==== Fin sonidos de eventos ====
+
+      const socket = io();
+    let miId = null;
+    let soyHost = false;
+    let yaUnido = false;
+    let yaRespondi = false;
+    let miMano = [];
+    let ultimosJugadores = [];
+    let cartaSeleccionada = null;
+    let valorSeleccionado = null;
+    let puedeJugarCartas = false;
+    let ultimaAccionInfo = null;
+    let preguntaEnCurso = false;
+    let categoriaActualId = null;
+
+   const CATEGORIAS_DISPONIBLES = [
+      { id: 'curiosidades', nombre: 'Curiosidades de la Historia' },
+      { id: 'ciencia', nombre: 'Ciencia y Tecnología' },
+      { id: 'arte_cultura', nombre: 'Arte y Cultura' }
+    ];
+
+    const NOMBRES_CARTAS = {
+      ese_pasto: 'Ese Pasto Se Ve Más Verde',
+      siguiendo_ganado: 'Siguiendo al Ganado',
+      vaca_tecnologica: 'Vaca Tecnológica',
+      leche_cortada: 'Leche Cortada',
+      vuelta_carnero: 'Vuelta de Carnero',
+      mala_leche: 'Mala Leche',
+      manos_mantequilla: 'Manos de Mantequilla',
+      vaca_tablero: 'La Vaca del Tablero'
+    };
+    const DESCRIPCIONES_CARTAS = {
+      ese_pasto: 'Intercambia tu respuesta con la de otro jugador.',
+      siguiendo_ganado: 'Todos pasan su respuesta al jugador de al lado.',
+      vaca_tecnologica: 'Cambia la pregunta; solo tú puedes responder la nueva.',
+      leche_cortada: 'Anula la última carta de acción jugada.',
+      vuelta_carnero: 'Cambia la respuesta de otro jugador a la contraria.',
+      mala_leche: 'Roba una carta de acción a otro jugador.',
+      manos_mantequilla: 'Cambia la respuesta de otro jugador al azar.',
+      vaca_tablero: 'Tú decides cuál es la respuesta correcta.'
+    };
+    const TIPO_CARTA = {
+      ese_pasto: 'jugador',
+      siguiendo_ganado: 'ninguno',
+      vaca_tecnologica: 'ninguno',
+      leche_cortada: 'ninguno',
+      vuelta_carnero: 'jugador',
+      mala_leche: 'jugador',
+      manos_mantequilla: 'jugador',
+      vaca_tablero: 'valor'
+    };
+
+    const formUnion = document.getElementById('form-union');
+    const infoJugador = document.getElementById('info-jugador');
+    const selectColor = document.getElementById('select-color');
+    const listaJugadores = document.getElementById('lista-jugadores');
+    const errorEl = document.getElementById('error');
+    const btnUnirse = document.getElementById('btn-unirse');
+    const inputNombre = document.getElementById('input-nombre');
+    const panelHost = document.getElementById('panel-host');
+    const selectCategoria = document.getElementById('select-categoria');
+    const selectorCategoriaDiv = document.getElementById('selector-categoria');
+    const btnElegirCategoria = document.getElementById('btn-elegir-categoria');
+    const errorHostEl = document.getElementById('error-host');
+    const btnAgregarBot = document.getElementById('btn-agregar-bot');
+    const categoriaActualVisible = document.getElementById('categoria-actual-visible');
+    const btnLanzar = document.getElementById('btn-lanzar');
+    const btnRevelar = document.getElementById('btn-revelar');
+    const zonaReiniciar = document.getElementById('zona-reiniciar');
+    const btnReiniciar = document.getElementById('btn-reiniciar');
+    const panelPregunta = document.getElementById('panel-pregunta');
+    const preguntaCategoria = document.getElementById('pregunta-categoria');
+    const preguntaTexto = document.getElementById('pregunta-texto');
+    const btnVerdadero = document.getElementById('btn-verdadero');
+    const btnFalso = document.getElementById('btn-falso');
+    const estadoRespuesta = document.getElementById('estado-respuesta');
+    const resultadoEl = document.getElementById('resultado');
+    const botonesRespuesta = document.getElementById('botones-respuesta');
+    const zonaMesa = document.getElementById('zona-mesa');
+    const bannerGanador = document.getElementById('banner-ganador');
+    const misCartasEl = document.getElementById('mis-cartas');
+    const panelAccion = document.getElementById('panel-accion');
+    const accionTitulo = document.getElementById('accion-titulo');
+    const accionObjetivo = document.getElementById('accion-objetivo');
+    const accionValor = document.getElementById('accion-valor');
+    const selectObjetivo = document.getElementById('select-objetivo');
+    const btnValorVerdadero = document.getElementById('btn-valor-verdadero');
+    const btnValorFalso = document.getElementById('btn-valor-falso');
+    const btnJugarCarta = document.getElementById('btn-jugar-carta');
+    const btnCancelarCarta = document.getElementById('btn-cancelar-carta');
+   const errorCartaEl = document.getElementById('error-carta');
+    const logCartas = document.getElementById('log-cartas');
+
+    // ==== Mesa de votación (arrastrar cartas) ====
+    function limpiarMesa() {
+      zonaMesa.innerHTML = '';
+    }
+
+    function renderMesaFaceDown(respondieronIds) {
+      zonaMesa.innerHTML = respondieronIds.map(id => {
+        const j = ultimosJugadores.find(x => x.id === id);
+        if (!j) return '';
+        return `<div class="carta-mesa"><div class="dorso">?</div><div class="nombre-mesa">${j.esBot ? '🤖' : '🐄'} ${j.nombre}</div></div>`;
+      }).join('');
+    }
+
+    function renderMesaRevelada(resultados) {
+      zonaMesa.innerHTML = resultados.map(r => {
+        const clase = r.correcto ? 'correcto' : 'incorrecto';
+        const letra = r.respuesta ? 'V' : 'F';
+        return `<div class="carta-mesa revelada ${clase}"><div class="dorso">${letra}</div><div class="nombre-mesa">${r.nombre}</div></div>`;
+      }).join('');
+    }
+
+    [btnVerdadero, btnFalso].forEach(el => {
+      el.addEventListener('dragstart', (e) => {
+        if (yaRespondi) { e.preventDefault(); return; }
+        e.dataTransfer.setData('text/plain', el.dataset.valor);
+        el.classList.add('arrastrando');
+      });
+      el.addEventListener('dragend', () => el.classList.remove('arrastrando'));
+    });
+
+    zonaMesa.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      zonaMesa.classList.add('zona-activa');
+    });
+    zonaMesa.addEventListener('dragleave', () => zonaMesa.classList.remove('zona-activa'));
+    zonaMesa.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zonaMesa.classList.remove('zona-activa');
+      const valor = e.dataTransfer.getData('text/plain');
+      if (valor === 'true') responder(true);
+      else if (valor === 'false') responder(false);
+    });
+    // ==== Fin mesa de votación ====
+
+    selectCategoria.innerHTML = CATEGORIAS_DISPONIBLES
+
+      .map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+
+    btnElegirCategoria.addEventListener('click', () => {
+      errorHostEl.textContent = '';
+      socket.emit('elegir_categoria', selectCategoria.value);
+    });
+
+    btnAgregarBot.addEventListener('click', () => {
+      errorHostEl.textContent = '';
+      socket.emit('agregar_bot');
+    });
+
+    function actualizarPanelHost() {
+      panelHost.style.display = soyHost ? 'block' : 'none';
+      zonaReiniciar.style.display = soyHost ? 'block' : 'none';
+    }
+
+    function agregarLog(texto) {
+      const p = document.createElement('p');
+      p.textContent = texto;
+      logCartas.prepend(p);
+    }
+
+    function tarjetaHabilitada(cartaId) {
+      if (cartaId === 'leche_cortada') return !!ultimaAccionInfo;
+      return puedeJugarCartas;
+    }
+
+    function descripcionParaCarta(cartaId) {
+      if (cartaId === 'leche_cortada' && ultimaAccionInfo) {
+        return `Anulará: "${ultimaAccionInfo.carta}" jugada por ${ultimaAccionInfo.deNombre} (vaca ${ultimaAccionInfo.deColor})`;
+      }
+      return DESCRIPCIONES_CARTAS[cartaId];
+    }
+
+   function renderizarMisCartas() {
+      misCartasEl.innerHTML = miMano
+        .map(cartaId => {
+          const habilitada = tarjetaHabilitada(cartaId);
+          return `
+          <div class="carta-item" data-carta="${cartaId}">
+            <img class="carta-imagen" src="images/${cartaId}.png" alt="${NOMBRES_CARTAS[cartaId]}" onerror="this.style.display='none'">
+            <div class="carta-nombre">${NOMBRES_CARTAS[cartaId]}</div>
+            <div class="carta-desc">${descripcionParaCarta(cartaId)}</div>
+            <button class="btn-jugar-esta-carta ${habilitada ? 'habilitada' : ''}" data-carta="${cartaId}" ${habilitada ? '' : 'disabled'}>Jugar carta</button>
+          </div>
+        `;
+        }).join('') || '<em>No tienes cartas.</em>';
+
+      misCartasEl.querySelectorAll('.btn-jugar-esta-carta').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const cartaId = btn.dataset.carta;
+          if (!tarjetaHabilitada(cartaId)) return;
+          errorCartaEl.textContent = '';
+          const tipo = TIPO_CARTA[cartaId];
+          if (tipo === 'ninguno') {
+            socket.emit('jugar_carta', { cartaId });
+          } else {
+            seleccionarCarta(cartaId);
+          }
+        });
+      });
+      resaltarCartaSeleccionada();
+    }
+
+    function resaltarCartaSeleccionada() {
+      misCartasEl.querySelectorAll('.carta-item').forEach(div => {
+        div.classList.toggle('seleccionada', div.dataset.carta === cartaSeleccionada);
+      });
+    }
+    function seleccionarCarta(cartaId) {
+      cartaSeleccionada = cartaId;
+      valorSeleccionado = null;
+      errorCartaEl.textContent = '';
+      const tipo = TIPO_CARTA[cartaId];
+
+      accionTitulo.textContent = `${NOMBRES_CARTAS[cartaId]}: ${descripcionParaCarta(cartaId)}`;
+      accionObjetivo.style.display = tipo === 'jugador' ? 'block' : 'none';
+      accionValor.style.display = tipo === 'valor' ? 'block' : 'none';
+      btnValorVerdadero.classList.remove('valor-activo', 'valor-inactiva');
+      btnValorFalso.classList.remove('valor-activo', 'valor-inactiva');
+
+   if (tipo === 'jugador') {
+        const otros = ultimosJugadores.filter(j => j.id !== miId);
+        if (otros.length === 0) {
+          selectObjetivo.innerHTML = '';
+          accionObjetivo.innerHTML = '<p style="color:#d92b2b;">No hay otros jugadores para elegir.</p>';
+        } else {
+          accionObjetivo.innerHTML = '<select id="select-objetivo"></select>';
+          document.getElementById('select-objetivo').innerHTML = otros
+            .map(j => `<option value="${j.id}">${j.nombre} (${j.color})</option>`)
+            .join('');
+        }
+      }
+
+      btnJugarCarta.disabled = tipo === 'valor' || (tipo === 'jugador' && ultimosJugadores.filter(j => j.id !== miId).length === 0);
+      
+      panelAccion.style.display = 'block';
+      resaltarCartaSeleccionada();
+    }
+
+    btnValorVerdadero.addEventListener('click', () => {
+      valorSeleccionado = true;
+      btnValorVerdadero.classList.add('valor-activo');
+      btnValorVerdadero.classList.remove('valor-inactiva');
+      btnValorFalso.classList.add('valor-inactiva');
+      btnValorFalso.classList.remove('valor-activo');
+      btnJugarCarta.disabled = false;
+    });
+    btnValorFalso.addEventListener('click', () => {
+      valorSeleccionado = false;
+      btnValorFalso.classList.add('valor-activo');
+      btnValorFalso.classList.remove('valor-inactiva');
+      btnValorVerdadero.classList.add('valor-inactiva');
+      btnValorVerdadero.classList.remove('valor-activo');
+      btnJugarCarta.disabled = false;
+    });
+
+    btnJugarCarta.addEventListener('click', () => {
+      if (!cartaSeleccionada) return;
+      const tipo = TIPO_CARTA[cartaSeleccionada];
+      const payload = { cartaId: cartaSeleccionada };
+      if (tipo === 'jugador') {
+        const select = document.getElementById('select-objetivo');
+        if (!select || !select.value) return;
+        payload.objetivoId = select.value;
+      }
+      if (tipo === 'valor') payload.valorElegido = valorSeleccionado;
+      socket.emit('jugar_carta', payload);
+      cerrarPanelAccion();
+    });
+
+    btnCancelarCarta.addEventListener('click', cerrarPanelAccion);
+
+    function cerrarPanelAccion() {
+      panelAccion.style.display = 'none';
+      cartaSeleccionada = null;
+      valorSeleccionado = null;
+      resaltarCartaSeleccionada();
+    }
+
+    socket.on('connect', () => { miId = socket.id; });
+
+    socket.on('union_exitosa', ({ nombre, color, esHost }) => {
+      yaUnido = true;
+      soyHost = esHost;
+      formUnion.style.display = 'none';
+      infoJugador.style.display = 'block';
+      infoJugador.textContent = `Jugando como: ${nombre} (vaca ${color})${esHost ? ' 👑 host' : ''}`;
+      actualizarPanelHost();
+    });
+
+  socket.on('ahora_eres_host', () => {
+      soyHost = true;
+      actualizarPanelHost();
+      infoJugador.textContent += ' — ahora eres host 👑';
+      selectorCategoriaDiv.style.display = 'block'; // el nuevo host puede cambiar de categoría si quiere
+    });
+
+    socket.on('tu_mano', (mano) => {
+      miMano = mano;
+      renderizarMisCartas();
+    });
+
+    socket.on('error_host', (mensaje) => {
+      errorHostEl.textContent = mensaje;
+    });
+
+    socket.on('estado_jugadores', ({ jugadores, coloresLibres, cupoLleno, ganador, ultimaAccionInfo: infoAccion, categoriaActual: categoriaInfo, puedeAgregarBot }) => {
+      ultimosJugadores = jugadores;
+      ultimaAccionInfo = infoAccion || null;
+      categoriaActualId = categoriaInfo ? categoriaInfo.id : null;
+      categoriaActualVisible.textContent = categoriaInfo ? `Categoría: ${categoriaInfo.nombre}` : 'Categoría: sin elegir todavía';
+      if (categoriaInfo) selectCategoria.value = categoriaInfo.id;
+      selectorCategoriaDiv.style.display = categoriaActualId ? 'none' : 'block';
+
+     listaJugadores.innerHTML = jugadores
+        .map(j => `<li>${j.esHost ? '👑 ' : (j.esBot ? '🤖 ' : '🐄 ')}${j.nombre} — vaca ${j.color}${j.esHost ? ' (host)' : ''}${j.esBot ? ' (bot)' : ''} — <strong>${j.puntaje} pts</strong> — 🎴 ${j.cartasEnMano}</li>`)
+        .join('');
+
+      selectColor.innerHTML = coloresLibres
+        .map(c => `<option value="${c}">${c}</option>`)
+        .join('');
+
+     if (!yaUnido) {
+        btnUnirse.disabled = cupoLleno || coloresLibres.length === 0;
+        if (cupoLleno) errorEl.textContent = 'La partida ya está llena (5 jugadores).';
+      }
+      btnAgregarBot.style.display = puedeAgregarBot ? 'inline-block' : 'none';
+      btnAgregarBot.disabled = cupoLleno;
+
+      if (ganador) {
+        bannerGanador.style.display = 'block';
+        bannerGanador.innerHTML = `🏆 ¡${ganador.nombre} (vaca ${ganador.color}) es el más Vacán con ${ganador.puntaje} puntos!`;
+        btnLanzar.disabled = true;
+      } else {
+        bannerGanador.style.display = 'none';
+        btnLanzar.disabled = preguntaEnCurso || !categoriaActualId;
+      }
+
+      renderizarMisCartas();
+    });
+
+    socket.on('error_union', (mensaje) => {
+      errorEl.textContent = mensaje;
+    });
+
+    socket.on('error_carta', (mensaje) => {
+      errorCartaEl.textContent = mensaje;
+    });
+
+    socket.on('carta_jugada', ({ jugador, jugadorColor, cartaId, carta, objetivo, objetivoColor, detalle }) => {
+      reproducirSonido(sonidoCarta);
+      const desc = DESCRIPCIONES_CARTAS[cartaId] || '';
+      const objetivoTexto = objetivoColor ? `${objetivo} (vaca ${objetivoColor})` : objetivo;
+      const notaFinal = detalle || desc;
+      agregarLog(`🎴 ${jugador} (vaca ${jugadorColor}) jugó "${carta}" sobre ${objetivoTexto} — ${notaFinal}`);
+    });
+
+    socket.on('accion_anulada', ({ por, porColor, deQuien, deQuienColor }) => {
+      agregarLog(`🥛 ${por} (vaca ${porColor}) anuló la acción de ${deQuien} (vaca ${deQuienColor}) con Leche Cortada`);
+    });
+
+   socket.on('pregunta_cambiada', ({ categoria, texto, casterId, casterNombre, casterColor }) => {
+      limpiarMesa();
+      preguntaCategoria.textContent = `Categoría: ${categoria}`;
+      preguntaTexto.textContent = texto;
+      if (miId !== casterId) {
+        botonesRespuesta.style.display = 'none';
+        estadoRespuesta.textContent = `⚡ La pregunta cambió (Vaca Tecnológica de ${casterNombre}, vaca ${casterColor}). Solo ${casterNombre} puede responder ahora.`;
+      }
+      puedeJugarCartas = false;
+      renderizarMisCartas();
+    });
+
+    socket.on('puedes_responder_de_nuevo', () => {
+      yaRespondi = false;
+      botonesRespuesta.style.display = 'block';
+      estadoRespuesta.textContent = 'La pregunta cambió — responde de nuevo.';
+      resultadoEl.innerHTML = '';
+    });
+
+    socket.on('pregunta_restaurada', ({ categoria, texto, yaRespondiste }) => {
+      preguntaCategoria.textContent = `Categoría: ${categoria}`;
+      preguntaTexto.textContent = texto;
+
+      if (yaRespondiste) {
+        yaRespondi = true;
+        botonesRespuesta.style.display = 'none';
+        estadoRespuesta.textContent = 'La pregunta cambió. Tu respuesta ya estaba guardada.';
+      } else {
+        yaRespondi = false;
+        botonesRespuesta.style.display = 'block';
+        estadoRespuesta.textContent = 'La pregunta cambió — puedes responder.';
+      }
+    });
+
+    btnUnirse.addEventListener('click', () => {
+      const nombre = inputNombre.value.trim();
+      const color = selectColor.value;
+      if (!nombre) {
+        errorEl.textContent = 'Escribe tu nombre primero.';
+        return;
+      }
+      errorEl.textContent = '';
+      socket.emit('unirse', { nombre, color });
+    });
+
+    btnLanzar.addEventListener('click', () => {
+      if (btnLanzar.disabled) return;
+      socket.emit('lanzar_pregunta');
+      preguntaEnCurso = true;
+      btnLanzar.disabled = true;
+    });
+
+    btnRevelar.addEventListener('click', () => {
+      if (btnRevelar.disabled) return;
+      socket.emit('revelar');
+    });
+
+    btnReiniciar.addEventListener('click', () => {
+      socket.emit('reiniciar_partida');
+      logCartas.innerHTML = '';
+    });
+
+    socket.on('partida_reiniciada', () => {
+      limpiarMesa();
+      panelPregunta.style.display = 'none';
+      resultadoEl.innerHTML = '';
+      estadoRespuesta.textContent = '';
+      puedeJugarCartas = false;
+      preguntaEnCurso = false;
+      bannerGanador.style.display = 'none';
+      logCartas.innerHTML = '';
+      renderizarMisCartas();
+    });
+    
+   socket.on('pregunta_lanzada', ({ categoria, texto }) => {
+      reproducirSonido(sonidoPregunta);
+      limpiarMesa();
+      panelPregunta.style.display = 'block';
+      preguntaCategoria.textContent = `Categoría: ${categoria}`;
+      preguntaTexto.textContent = texto;
+      estadoRespuesta.textContent = '';
+      resultadoEl.innerHTML = '';
+      yaRespondi = false;
+      botonesRespuesta.style.display = 'block';
+      btnRevelar.disabled = true;
+      puedeJugarCartas = false;
+      preguntaEnCurso = true;
+      btnLanzar.disabled = true;
+      renderizarMisCartas();
+    });
+
+    btnVerdadero.addEventListener('click', () => responder(true));
+    btnFalso.addEventListener('click', () => responder(false));
+
+    function responder(respuesta) {
+      if (yaRespondi) return;
+      yaRespondi = true;
+      socket.emit('responder', { respuesta });
+      botonesRespuesta.style.display = 'none';
+      estadoRespuesta.textContent = 'Respuesta enviada. Esperando a los demás...';
+    }
+
+   socket.on('conteo_respuestas', ({ respondieron, total, respondieronIds }) => {
+      if (soyHost) {
+        estadoRespuesta.textContent = `${respondieron} de ${total} jugadores han respondido.`;
+        btnRevelar.disabled = !(total > 0 && respondieron === total);
+      }
+      puedeJugarCartas = total > 0 && respondieron === total;
+      renderMesaFaceDown(respondieronIds || []);
+      renderizarMisCartas();
+    });
+
+   socket.on('resultado_revelado', ({ correcta, resultados }) => {
+      reproducirSonido(sonidoRevelar);
+      renderMesaRevelada(resultados);
+      puedeJugarCartas = false;
+      btnRevelar.disabled = true;
+      preguntaEnCurso = false;
+      renderizarMisCartas();
+      estadoRespuesta.textContent = '';
+      const textoCorrecta = correcta ? 'VERDADERO' : 'FALSO';
+      let html = `<p><strong>Respuesta correcta: ${textoCorrecta}</strong></p><ul>`;
+      resultados.forEach(r => {
+        const clase = r.correcto ? 'resultado-correcto' : 'resultado-incorrecto';
+        const suRespuesta = r.respuesta ? 'Verdadero' : 'Falso';
+        html += `<li class="${clase}">${r.nombre} (${r.color}) respondió ${suRespuesta} ${r.correcto ? '✅' : '❌ (roba carta)'}</li>`;
+      });
+      html += '</ul>';
+      resultadoEl.innerHTML = html;
+    });
+  </script>
+</body>
+</html>
