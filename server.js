@@ -8,158 +8,159 @@ const io = new Server(server);
 
 app.use(express.static('public'));
 
-const COLORES_DISPONIBLES = ['Roja', 'Azul', 'Verde', 'Amarilla', 'Morada'];
+const COLORES_DISPONIBLES = ['Red', 'Blue', 'Green', 'Yellow', 'Purple'];
 const MAX_JUGADORES = 5;
 const PUNTAJE_GANADOR = 5;
 const MAX_CARTAS_MANO = 3;
 
+// NOTA: los textos de las preguntas siguen en español por ahora — se traducen en el siguiente paso.
 const CATEGORIAS = {
   curiosidades: {
-    nombre: 'Curiosidades de la Historia',
+    nombre: 'Historical Curiosities',
     preguntas: [
-      { categoria: 'Historia', texto: 'La Torre Eiffel iba a ser desmontada 20 años después de construirse.', respuesta: true },
-      { categoria: 'Historia', texto: 'Napoleón Bonaparte era muy bajo de estatura, medía menos de 1.60 m.', respuesta: false },
-      { categoria: 'Curiosidades', texto: 'La Coca-Cola fue creada originalmente como un medicamento.', respuesta: true },
-      { categoria: 'Historia', texto: 'Los antiguos egipcios consideraban al gato un animal sagrado.', respuesta: true },
-      { categoria: 'Cine', texto: 'La primera película con sonido se estrenó en el siglo XIX.', respuesta: false },
-      { categoria: 'Historia', texto: 'El Imperio Romano usaba el pan y circo para entretener a la gente.', respuesta: true },
-      { categoria: 'Historia', texto: 'La Revolución Industrial comenzó en Francia.', respuesta: false },
-      { categoria: 'Historia', texto: 'Cleopatra era de origen egipcio nativo.', respuesta: false },
-      { categoria: 'Historia', texto: 'La Guerra de los Cien Años duró exactamente 100 años.', respuesta: false },
-      { categoria: 'Historia', texto: 'El Titanic se hundió en su viaje inaugural.', respuesta: true },
-      { categoria: 'Historia', texto: 'La Gran Muralla China se construyó en un solo periodo histórico.', respuesta: false },
-      { categoria: 'Curiosidades', texto: 'Los vikingos usaban cascos con cuernos en batalla.', respuesta: false },
-      { categoria: 'Historia', texto: 'La Estatua de la Libertad fue un regalo de Francia a Estados Unidos.', respuesta: true },
-      { categoria: 'Historia', texto: 'El primer país en dar el voto a las mujeres fue Nueva Zelanda.', respuesta: true },
-      { categoria: 'Historia', texto: 'Julio César fue el primer emperador romano.', respuesta: false },
-      { categoria: 'Historia', texto: 'La Peste Negra mató a gran parte de la población europea en el siglo XIV.', respuesta: true },
-      { categoria: 'Historia', texto: 'Los Juegos Olímpicos antiguos se celebraban cada 4 años en Grecia.', respuesta: true },
-      { categoria: 'Historia', texto: 'Cristóbal Colón demostró que la Tierra era redonda.', respuesta: false },
-      { categoria: 'Historia', texto: 'El Imperio Inca no usaba la rueda para uso práctico.', respuesta: true },
-      { categoria: 'Historia', texto: 'La Bastilla fue una prisión tomada al inicio de la Revolución Francesa.', respuesta: true },
-      { categoria: 'Curiosidades', texto: 'Albert Einstein reprobó matemáticas en la escuela.', respuesta: false },
-      { categoria: 'Curiosidades', texto: 'El código Morse fue inventado por Samuel Morse.', respuesta: true },
-      { categoria: 'Historia', texto: 'La antigua biblioteca de Alejandría se quemó por completo en un solo incendio.', respuesta: false },
-      { categoria: 'Historia', texto: 'Gutenberg inventó la imprenta de tipos móviles en Europa.', respuesta: true },
-      { categoria: 'Historia', texto: 'Los aztecas practicaban sacrificios humanos como parte de su religión.', respuesta: true },
-      { categoria: 'Historia', texto: 'Machu Picchu fue construido por los mayas.', respuesta: false },
-      { categoria: 'Historia', texto: 'La Segunda Guerra Mundial comenzó con la invasión de Polonia.', respuesta: true },
-      { categoria: 'Historia', texto: 'Marco Polo fue el primer europeo en llegar a China.', respuesta: false },
-      { categoria: 'Historia', texto: 'La independencia de Chile se declaró formalmente en 1818.', respuesta: true },
-      { categoria: 'Historia', texto: 'El Coliseo Romano se usaba para combates de gladiadores.', respuesta: true },
-      { categoria: 'Historia', texto: 'Gengis Kan unificó las tribus mongolas.', respuesta: true },
-      { categoria: 'Curiosidades', texto: 'La Torre de Pisa se inclina debido a un diseño intencional.', respuesta: false },
-      { categoria: 'Historia', texto: 'El Renacimiento comenzó en Italia.', respuesta: true },
-      { categoria: 'Historia', texto: 'Los faraones egipcios eran momificados tras su muerte.', respuesta: true },
-      { categoria: 'Historia', texto: 'La bandera de Chile fue diseñada durante la colonia española.', respuesta: false },
-      { categoria: 'Historia', texto: 'El Imperio Otomano duró más de 600 años.', respuesta: true },
-      { categoria: 'Historia', texto: 'La Guerra Fría fue un conflicto armado directo entre EE.UU. y la URSS.', respuesta: false },
-      { categoria: 'Historia', texto: 'Los primeros Juegos Olímpicos modernos se celebraron en Atenas.', respuesta: true },
-      { categoria: 'Curiosidades', texto: 'El Big Ben es el nombre oficial de la torre completa en Londres.', respuesta: false },
-      { categoria: 'Historia', texto: 'La Revolución Rusa ocurrió en 1917.', respuesta: true },
+      { categoria: 'History', texto: 'The Eiffel Tower was meant to be dismantled 20 years after it was built.', respuesta: true },
+      { categoria: 'History', texto: "Napoleon Bonaparte was very short, under 5'3\".", respuesta: false },
+      { categoria: 'Trivia', texto: 'Coca-Cola was originally created as a medicine.', respuesta: true },
+      { categoria: 'History', texto: 'Ancient Egyptians considered cats sacred animals.', respuesta: true },
+      { categoria: 'Film', texto: 'The first sound film premiered in the 19th century.', respuesta: false },
+      { categoria: 'History', texto: 'The Roman Empire used "bread and circuses" to entertain the public.', respuesta: true },
+      { categoria: 'History', texto: 'The Industrial Revolution began in France.', respuesta: false },
+      { categoria: 'History', texto: 'Cleopatra was of native Egyptian descent.', respuesta: false },
+      { categoria: 'History', texto: "The Hundred Years' War lasted exactly 100 years.", respuesta: false },
+      { categoria: 'History', texto: 'The Titanic sank on its maiden voyage.', respuesta: true },
+      { categoria: 'History', texto: 'The Great Wall of China was built in a single historical period.', respuesta: false },
+      { categoria: 'Trivia', texto: 'Vikings wore horned helmets in battle.', respuesta: false },
+      { categoria: 'History', texto: 'The Statue of Liberty was a gift from France to the United States.', respuesta: true },
+      { categoria: 'History', texto: 'The first country to grant women the right to vote was New Zealand.', respuesta: true },
+      { categoria: 'History', texto: 'Julius Caesar was the first Roman emperor.', respuesta: false },
+      { categoria: 'History', texto: "The Black Death killed a large part of Europe's population in the 14th century.", respuesta: true },
+      { categoria: 'History', texto: 'The ancient Olympic Games were held every 4 years in Greece.', respuesta: true },
+      { categoria: 'History', texto: 'Christopher Columbus proved the Earth was round.', respuesta: false },
+      { categoria: 'History', texto: "The Inca Empire didn't use the wheel for practical purposes.", respuesta: true },
+      { categoria: 'History', texto: 'The Bastille was a prison stormed at the start of the French Revolution.', respuesta: true },
+      { categoria: 'Trivia', texto: 'Albert Einstein failed math in school.', respuesta: false },
+      { categoria: 'Trivia', texto: 'Morse code was invented by Samuel Morse.', respuesta: true },
+      { categoria: 'History', texto: 'The ancient Library of Alexandria burned down completely in a single fire.', respuesta: false },
+      { categoria: 'History', texto: 'Gutenberg invented the movable-type printing press in Europe.', respuesta: true },
+      { categoria: 'History', texto: 'The Aztecs practiced human sacrifice as part of their religion.', respuesta: true },
+      { categoria: 'History', texto: 'Machu Picchu was built by the Maya.', respuesta: false },
+      { categoria: 'History', texto: 'World War II began with the invasion of Poland.', respuesta: true },
+      { categoria: 'History', texto: 'Marco Polo was the first European to reach China.', respuesta: false },
+      { categoria: 'History', texto: "Chile's independence was formally declared in 1818.", respuesta: true },
+      { categoria: 'History', texto: 'The Roman Colosseum was used for gladiator fights.', respuesta: true },
+      { categoria: 'History', texto: 'Genghis Khan unified the Mongol tribes.', respuesta: true },
+      { categoria: 'Trivia', texto: 'The Leaning Tower of Pisa leans by intentional design.', respuesta: false },
+      { categoria: 'History', texto: 'The Renaissance began in Italy.', respuesta: true },
+      { categoria: 'History', texto: 'Egyptian pharaohs were mummified after death.', respuesta: true },
+      { categoria: 'History', texto: "Chile's flag was designed during Spanish colonial rule.", respuesta: false },
+      { categoria: 'History', texto: 'The Ottoman Empire lasted more than 600 years.', respuesta: true },
+      { categoria: 'History', texto: 'The Cold War was a direct armed conflict between the US and the USSR.', respuesta: false },
+      { categoria: 'History', texto: 'The first modern Olympic Games were held in Athens.', respuesta: true },
+      { categoria: 'Trivia', texto: 'Big Ben is the official name of the entire clock tower in London.', respuesta: false },
+      { categoria: 'History', texto: 'The Russian Revolution took place in 1917.', respuesta: true },
     ]
   },
   ciencia: {
-    nombre: 'Ciencia y Tecnología',
+    nombre: 'Science & Technology',
     preguntas: [
-      { categoria: 'Ciencia', texto: 'El cerebro humano usa solo el 10% de su capacidad.', respuesta: false },
-      { categoria: 'Ciencia', texto: 'La luz viaja más rápido que el sonido.', respuesta: true },
-      { categoria: 'Ciencia', texto: 'El agua es un compuesto formado por hidrógeno y oxígeno.', respuesta: true },
-      { categoria: 'Ciencia', texto: 'Los diamantes están hechos de carbono.', respuesta: true },
-      { categoria: 'Tecnología', texto: 'El primer computador ocupaba toda una habitación.', respuesta: true },
-      { categoria: 'Tecnología', texto: 'Internet y la World Wide Web son exactamente lo mismo.', respuesta: false },
-      { categoria: 'Ciencia', texto: 'El ADN humano es casi idéntico al de los chimpancés (cerca del 99%).', respuesta: true },
-      { categoria: 'Ciencia', texto: 'Marte es el planeta más caliente del sistema solar.', respuesta: false },
-      { categoria: 'Ciencia', texto: 'Los antibióticos son efectivos contra los virus.', respuesta: false },
-      { categoria: 'Ciencia', texto: 'La Tierra tarda exactamente 24 horas en dar una vuelta sobre su eje.', respuesta: false },
-      { categoria: 'Tecnología', texto: 'El sistema operativo Android fue creado por Google desde cero.', respuesta: false },
-      { categoria: 'Tecnología', texto: 'El primer satélite artificial fue el Sputnik.', respuesta: true },
-      { categoria: 'Ciencia', texto: 'Las plantas realizan fotosíntesis para producir su propio alimento.', respuesta: true },
-      { categoria: 'Ciencia', texto: 'El sonido puede viajar en el vacío del espacio.', respuesta: false },
-      { categoria: 'Tecnología', texto: 'El wifi transmite datos mediante ondas de radio.', respuesta: true },
-      { categoria: 'Ciencia', texto: 'El litio es un metal usado en baterías recargables.', respuesta: true },
-      { categoria: 'Ciencia', texto: 'La velocidad de la luz es de aproximadamente 300.000 km por segundo.', respuesta: true },
-      { categoria: 'Ciencia', texto: 'Los agujeros negros pueden verse directamente con un telescopio óptico normal.', respuesta: false },
-      { categoria: 'Tecnología', texto: 'El primer smartphone de la historia fue el iPhone.', respuesta: false },
-      { categoria: 'Tecnología', texto: 'El código binario usa solo los números 0 y 1.', respuesta: true },
-      { categoria: 'Tecnología', texto: 'ChatGPT fue creado por Google.', respuesta: false },
-      { categoria: 'Ciencia', texto: 'El corazón humano tiene cuatro cámaras.', respuesta: true },
-      { categoria: 'Ciencia', texto: 'Los volcanes solo existen en la superficie terrestre.', respuesta: false },
-      { categoria: 'Ciencia', texto: 'El plástico se degrada completamente en pocos años.', respuesta: false },
-      { categoria: 'Ciencia', texto: 'La energía solar es una fuente de energía renovable.', respuesta: true },
-      { categoria: 'Tecnología', texto: 'El primer lenguaje de programación fue Python.', respuesta: false },
-      { categoria: 'Ciencia', texto: 'Los electrones tienen carga positiva.', respuesta: false },
-      { categoria: 'Tecnología', texto: 'El GPS funciona gracias a satélites.', respuesta: true },
-      { categoria: 'Ciencia', texto: 'La Luna genera su propia luz.', respuesta: false },
-      { categoria: 'Ciencia', texto: 'El grafeno es un material extremadamente resistente hecho de carbono.', respuesta: true },
-      { categoria: 'Tecnología', texto: 'Bluetooth y wifi usan exactamente la misma tecnología.', respuesta: false },
-      { categoria: 'Ciencia', texto: 'El sistema solar tiene ocho planetas oficialmente reconocidos.', respuesta: true },
-      { categoria: 'Tecnología', texto: 'Los virus informáticos pueden dañar el hardware físico de una computadora.', respuesta: false },
-      { categoria: 'Ciencia', texto: 'El oxígeno es el elemento más abundante en el universo.', respuesta: false },
-      { categoria: 'Ciencia', texto: 'La clonación de animales ya se ha logrado exitosamente.', respuesta: true },
-      { categoria: 'Tecnología', texto: 'Un byte equivale a 8 bits.', respuesta: true },
-      { categoria: 'Tecnología', texto: 'Las redes 5G son más lentas que las redes 4G.', respuesta: false },
-      { categoria: 'Tecnología', texto: 'El telescopio espacial Hubble orbita la Tierra.', respuesta: true },
-      { categoria: 'Ciencia', texto: 'La fusión nuclear es el mismo proceso que ocurre en el Sol.', respuesta: true },
-      { categoria: 'Tecnología', texto: 'Ya existen robots que realizan cirugías con asistencia humana.', respuesta: true },
+      { categoria: 'Science', texto: 'Humans only use 10% of their brain.', respuesta: false },
+      { categoria: 'Science', texto: 'Light travels faster than sound.', respuesta: true },
+      { categoria: 'Science', texto: 'Water is a compound made of hydrogen and oxygen.', respuesta: true },
+      { categoria: 'Science', texto: 'Diamonds are made of carbon.', respuesta: true },
+      { categoria: 'Technology', texto: 'The first computer took up an entire room.', respuesta: true },
+      { categoria: 'Technology', texto: 'The Internet and the World Wide Web are exactly the same thing.', respuesta: false },
+      { categoria: 'Science', texto: 'Human DNA is nearly identical to chimpanzee DNA (about 99%).', respuesta: true },
+      { categoria: 'Science', texto: 'Mars is the hottest planet in the solar system.', respuesta: false },
+      { categoria: 'Science', texto: 'Antibiotics are effective against viruses.', respuesta: false },
+      { categoria: 'Science', texto: 'Earth takes exactly 24 hours to complete one rotation.', respuesta: false },
+      { categoria: 'Technology', texto: 'The Android operating system was built by Google from scratch.', respuesta: false },
+      { categoria: 'Technology', texto: 'The first artificial satellite was Sputnik.', respuesta: true },
+      { categoria: 'Science', texto: 'Plants perform photosynthesis to make their own food.', respuesta: true },
+      { categoria: 'Science', texto: 'Sound can travel through the vacuum of space.', respuesta: false },
+      { categoria: 'Technology', texto: 'Wifi transmits data using radio waves.', respuesta: true },
+      { categoria: 'Science', texto: 'Lithium is a metal used in rechargeable batteries.', respuesta: true },
+      { categoria: 'Science', texto: 'The speed of light is about 300,000 km per second.', respuesta: true },
+      { categoria: 'Science', texto: 'Black holes can be seen directly with a regular optical telescope.', respuesta: false },
+      { categoria: 'Technology', texto: 'The first smartphone in history was the iPhone.', respuesta: false },
+      { categoria: 'Technology', texto: 'Binary code only uses the numbers 0 and 1.', respuesta: true },
+      { categoria: 'Technology', texto: 'ChatGPT was created by Google.', respuesta: false },
+      { categoria: 'Science', texto: 'The human heart has four chambers.', respuesta: true },
+      { categoria: 'Science', texto: "Volcanoes only exist on Earth's surface.", respuesta: false },
+      { categoria: 'Science', texto: 'Plastic fully degrades within a few years.', respuesta: false },
+      { categoria: 'Science', texto: 'Solar energy is a renewable energy source.', respuesta: true },
+      { categoria: 'Technology', texto: 'The first programming language was Python.', respuesta: false },
+      { categoria: 'Science', texto: 'Electrons carry a positive charge.', respuesta: false },
+      { categoria: 'Technology', texto: 'GPS works thanks to satellites.', respuesta: true },
+      { categoria: 'Science', texto: 'The Moon generates its own light.', respuesta: false },
+      { categoria: 'Science', texto: 'Graphene is an extremely strong material made of carbon.', respuesta: true },
+      { categoria: 'Technology', texto: 'Bluetooth and wifi use exactly the same technology.', respuesta: false },
+      { categoria: 'Science', texto: 'The solar system has eight officially recognized planets.', respuesta: true },
+      { categoria: 'Technology', texto: "Computer viruses can physically damage a computer's hardware.", respuesta: false },
+      { categoria: 'Science', texto: 'Oxygen is the most abundant element in the universe.', respuesta: false },
+      { categoria: 'Science', texto: 'Animal cloning has already been successfully achieved.', respuesta: true },
+      { categoria: 'Technology', texto: 'A byte equals 8 bits.', respuesta: true },
+      { categoria: 'Technology', texto: '5G networks are slower than 4G networks.', respuesta: false },
+      { categoria: 'Technology', texto: 'The Hubble Space Telescope orbits the Earth.', respuesta: true },
+      { categoria: 'Science', texto: 'Nuclear fusion is the same process that happens in the Sun.', respuesta: true },
+      { categoria: 'Technology', texto: 'Robots already perform surgeries with human assistance.', respuesta: true },
     ]
   },
   arte_cultura: {
-    nombre: 'Arte y Cultura',
+    nombre: 'Art & Culture',
     preguntas: [
-      { categoria: 'Pintura', texto: 'La Mona Lisa fue pintada por Leonardo da Vinci.', respuesta: true },
-      { categoria: 'Arte', texto: 'Pablo Picasso fue el creador del movimiento cubista.', respuesta: true },
-      { categoria: 'Pintura', texto: 'Vincent van Gogh vendió muchas pinturas en vida.', respuesta: false },
-      { categoria: 'Danza', texto: 'El ballet clásico se originó en Italia durante el Renacimiento.', respuesta: true },
-      { categoria: 'Pintura', texto: 'Frida Kahlo era una pintora mexicana.', respuesta: true },
-      { categoria: 'Teatro', texto: '"El Fantasma de la Ópera" está ambientada en un teatro de Londres.', respuesta: false },
-      { categoria: 'Pintura', texto: 'Miguel Ángel pintó el techo de la Capilla Sixtina.', respuesta: true },
-      { categoria: 'Danza', texto: 'El flamenco es un género musical y de danza originario de España.', respuesta: true },
-      { categoria: 'Literatura', texto: 'Gabriel García Márquez ganó el Premio Nobel de Literatura.', respuesta: true },
-      { categoria: 'Arte', texto: 'El movimiento surrealista buscaba representar el mundo de los sueños.', respuesta: true },
-      { categoria: 'Pintura', texto: 'Salvador Dalí era un pintor surrealista español.', respuesta: true },
-      { categoria: 'Danza', texto: 'El tango es un género musical y de baile originario de Argentina y Uruguay.', respuesta: true },
-      { categoria: 'Literatura', texto: 'William Shakespeare escribió "Hamlet".', respuesta: true },
-      { categoria: 'Pintura', texto: 'La Mona Lisa se exhibe actualmente en el Museo del Louvre.', respuesta: true },
-      { categoria: 'Arte', texto: 'El movimiento impresionista se originó en Alemania.', respuesta: false },
-      { categoria: 'Música', texto: 'Beethoven compuso nueve sinfonías.', respuesta: true },
-      { categoria: 'Teatro', texto: 'El Cirque du Soleil combina circo, teatro y música.', respuesta: true },
-      { categoria: 'Literatura', texto: 'Isabel Allende es una escritora chilena.', respuesta: true },
-      { categoria: 'Arquitectura', texto: 'La arquitectura gótica se caracteriza por sus arcos apuntados.', respuesta: true },
-      { categoria: 'Música', texto: 'El K-pop es un género musical originario de Corea del Sur.', respuesta: true },
-      { categoria: 'Escultura', texto: 'Auguste Rodin fue un famoso escultor francés, autor de "El Pensador".', respuesta: true },
-      { categoria: 'Música', texto: 'El jazz nació principalmente en Nueva Orleans.', respuesta: true },
-      { categoria: 'Literatura', texto: '"Romeo y Julieta" fue escrita por Cervantes.', respuesta: false },
-      { categoria: 'Arte', texto: 'El Renacimiento surgió primero en Italia.', respuesta: true },
-      { categoria: 'Arte', texto: 'Andy Warhol es conocido como referente del arte pop.', respuesta: true },
-      { categoria: 'Danza', texto: 'La danza contemporánea sigue reglas idénticas al ballet clásico.', respuesta: false },
-      { categoria: 'Literatura', texto: 'Pablo Neruda era un poeta chileno.', respuesta: true },
-      { categoria: 'Arte', texto: 'El Museo del Prado está en Madrid.', respuesta: true },
-      { categoria: 'Música', texto: 'La música clásica barroca incluye a compositores como Bach y Vivaldi.', respuesta: true },
-      { categoria: 'Arte', texto: 'El grafiti es considerado por algunos una forma de arte urbano.', respuesta: true },
-      { categoria: 'Literatura', texto: '"Don Quijote de la Mancha" fue escrita por Miguel de Cervantes.', respuesta: true },
-      { categoria: 'Arte', texto: 'El movimiento Art Nouveau se caracteriza por líneas rectas y geométricas.', respuesta: false },
-      { categoria: 'Arte', texto: 'La Bienal de Venecia es un evento de arte contemporáneo.', respuesta: true },
-      { categoria: 'Pintura', texto: 'Diego Rivera fue un muralista mexicano.', respuesta: true },
-      { categoria: 'Teatro', texto: 'El teatro griego antiguo incluía comedias y tragedias.', respuesta: true },
-      { categoria: 'Pintura', texto: 'Claude Monet es reconocido por su serie de pinturas de los nenúfares.', respuesta: true },
-      { categoria: 'Música', texto: 'El hip hop incluye elementos como el rap, el break dance y el grafiti.', respuesta: true },
-      { categoria: 'Escultura', texto: 'La escultura "El David" fue creada por Donatello.', respuesta: false },
-      { categoria: 'Teatro', texto: 'El Cirque du Soleil se originó en Canadá.', respuesta: true },
-      { categoria: 'Música', texto: 'La música folclórica chilena incluye instrumentos como la guitarra y el charango.', respuesta: true },
+      { categoria: 'Painting', texto: 'The Mona Lisa was painted by Leonardo da Vinci.', respuesta: true },
+      { categoria: 'Art', texto: 'Pablo Picasso was the creator of the Cubist movement.', respuesta: true },
+      { categoria: 'Painting', texto: 'Vincent van Gogh sold many paintings during his lifetime.', respuesta: false },
+      { categoria: 'Dance', texto: 'Classical ballet originated in Italy during the Renaissance.', respuesta: true },
+      { categoria: 'Painting', texto: 'Frida Kahlo was a Mexican painter.', respuesta: true },
+      { categoria: 'Theater', texto: '"The Phantom of the Opera" is set in a London theater.', respuesta: false },
+      { categoria: 'Painting', texto: 'Michelangelo painted the ceiling of the Sistine Chapel.', respuesta: true },
+      { categoria: 'Dance', texto: 'Flamenco is a musical and dance genre originating in Spain.', respuesta: true },
+      { categoria: 'Literature', texto: 'Gabriel García Márquez won the Nobel Prize in Literature.', respuesta: true },
+      { categoria: 'Art', texto: 'The Surrealist movement aimed to represent the world of dreams.', respuesta: true },
+      { categoria: 'Painting', texto: 'Salvador Dalí was a Spanish surrealist painter.', respuesta: true },
+      { categoria: 'Dance', texto: 'Tango is a musical and dance genre originating in Argentina and Uruguay.', respuesta: true },
+      { categoria: 'Literature', texto: 'William Shakespeare wrote "Hamlet."', respuesta: true },
+      { categoria: 'Painting', texto: 'The Mona Lisa is currently displayed at the Louvre Museum.', respuesta: true },
+      { categoria: 'Art', texto: 'The Impressionist movement originated in Germany.', respuesta: false },
+      { categoria: 'Music', texto: 'Beethoven composed nine symphonies.', respuesta: true },
+      { categoria: 'Theater', texto: 'Cirque du Soleil combines circus, theater, and music.', respuesta: true },
+      { categoria: 'Literature', texto: 'Isabel Allende is a Chilean writer.', respuesta: true },
+      { categoria: 'Architecture', texto: 'Gothic architecture is characterized by pointed arches.', respuesta: true },
+      { categoria: 'Music', texto: 'K-pop is a music genre that originated in South Korea.', respuesta: true },
+      { categoria: 'Sculpture', texto: 'Auguste Rodin was a famous French sculptor, creator of "The Thinker."', respuesta: true },
+      { categoria: 'Music', texto: 'Jazz originated mainly in New Orleans.', respuesta: true },
+      { categoria: 'Literature', texto: '"Romeo and Juliet" was written by Cervantes.', respuesta: false },
+      { categoria: 'Art', texto: 'The Renaissance emerged first in Italy.', respuesta: true },
+      { categoria: 'Art', texto: 'Andy Warhol is known as a pop art icon.', respuesta: true },
+      { categoria: 'Dance', texto: 'Contemporary dance follows the exact same rules as classical ballet.', respuesta: false },
+      { categoria: 'Literature', texto: 'Pablo Neruda was a Chilean poet.', respuesta: true },
+      { categoria: 'Art', texto: 'The Prado Museum is located in Madrid.', respuesta: true },
+      { categoria: 'Music', texto: 'Baroque classical music includes composers like Bach and Vivaldi.', respuesta: true },
+      { categoria: 'Art', texto: 'Graffiti is considered by some to be a form of urban art.', respuesta: true },
+      { categoria: 'Literature', texto: '"Don Quixote" was written by Miguel de Cervantes.', respuesta: true },
+      { categoria: 'Art', texto: 'The Art Nouveau movement is characterized by straight, geometric lines.', respuesta: false },
+      { categoria: 'Art', texto: 'The Venice Biennale is a contemporary art event.', respuesta: true },
+      { categoria: 'Painting', texto: 'Diego Rivera was a Mexican muralist.', respuesta: true },
+      { categoria: 'Theater', texto: 'Ancient Greek theater included both comedies and tragedies.', respuesta: true },
+      { categoria: 'Painting', texto: 'Claude Monet is known for his series of water lily paintings.', respuesta: true },
+      { categoria: 'Music', texto: 'Hip hop includes elements like rap, breakdancing, and graffiti.', respuesta: true },
+      { categoria: 'Sculpture', texto: 'The sculpture "David" was created by Donatello.', respuesta: false },
+      { categoria: 'Theater', texto: 'Cirque du Soleil originated in Canada.', respuesta: true },
+      { categoria: 'Music', texto: 'Chilean folk music includes instruments like the guitar and charango.', respuesta: true },
     ]
   }
 };
 
 const CARTAS_ACCION = {
-  ese_pasto: { nombre: 'Ese Pasto Se Ve Más Verde', tipo: 'jugador' },
-  siguiendo_ganado: { nombre: 'Siguiendo al Ganado', tipo: 'ninguno' },
-  vaca_tecnologica: { nombre: 'Vaca Tecnológica', tipo: 'ninguno' },
-  leche_cortada: { nombre: 'Leche Cortada', tipo: 'ninguno' },
-  vuelta_carnero: { nombre: 'Vuelta de Carnero', tipo: 'jugador' },
-  mala_leche: { nombre: 'Mala Leche', tipo: 'jugador' },
-  manos_mantequilla: { nombre: 'Manos de Mantequilla', tipo: 'jugador' },
-  vaca_tablero: { nombre: 'La Vaca del Tablero', tipo: 'valor' },
+  ese_pasto: { nombre: 'The Grass Is Greener', tipo: 'jugador' },
+  siguiendo_ganado: { nombre: 'Following the Herd', tipo: 'ninguno' },
+  vaca_tecnologica: { nombre: 'Tech Cow', tipo: 'ninguno' },
+  leche_cortada: { nombre: 'Sour Milk', tipo: 'ninguno' },
+  vuelta_carnero: { nombre: 'Somersault', tipo: 'jugador' },
+  mala_leche: { nombre: 'Bad Milk', tipo: 'jugador' },
+  manos_mantequilla: { nombre: 'Butter Fingers', tipo: 'jugador' },
+  vaca_tablero: { nombre: 'The Boss Cow', tipo: 'valor' },
 };
 
 let jugadores = {}; // { socketId: { nombre, color, esHost, esBot, puntaje, manoCartas: [] } }
@@ -172,7 +173,7 @@ let primeraPreguntaLanzada = false;
 
 let mazoAccion = [];
 let descarteAccion = [];
-const NOMBRES_BOTS = ['Bot Ana', 'Bot Beto', 'Bot Cami', 'Bot Dani'];
+const NOMBRES_BOTS = ['Bot Amy', 'Bot Ben', 'Bot Cara', 'Bot Dan'];
 let contadorBots = 0;
 
 function crearIdBot() {
@@ -236,7 +237,7 @@ function emitirEstado() {
     categoriaActual: categoriaActual ? { id: categoriaActual, nombre: CATEGORIAS[categoriaActual].nombre } : null,
     puedeAgregarBot: !primeraPreguntaLanzada,
     ultimaAccionInfo: ultimaAccion ? {
-      carta: ultimaAccion.tipo === 'leche_cortada' ? 'Leche Cortada' : CARTAS_ACCION[ultimaAccion.tipo].nombre,
+      carta: ultimaAccion.tipo === 'leche_cortada' ? 'Sour Milk' : CARTAS_ACCION[ultimaAccion.tipo].nombre,
       deNombre: ultimaAccion.deNombre,
       deColor: ultimaAccion.deColor
     } : null
@@ -300,7 +301,7 @@ function emitirPreguntaSincronizada() {
       yaRespondiste: preguntaActiva.respuestas[id] !== undefined
     });
   });
- io.emit('conteo_respuestas', {
+  io.emit('conteo_respuestas', {
     respondieron: Object.keys(preguntaActiva.respuestas).length,
     total: Object.keys(jugadores).length,
     respondieronIds: Object.keys(preguntaActiva.respuestas)
@@ -352,17 +353,14 @@ function procesarRespuesta(jugadorId, respuesta) {
   }
 }
 
-// Ejecuta la lógica de una carta de acción para cualquier jugador (humano o bot).
-// Reutilizada tanto por el handler de socket como por la IA de los bots.
 function procesarJugarCarta(jugadorId, { cartaId, objetivoId, valorElegido }) {
   const jugador = jugadores[jugadorId];
   if (!jugador) return false;
   const idx = jugador.manoCartas.indexOf(cartaId);
   if (idx === -1) return false;
 
-  // Todas las cartas excepto Leche Cortada requieren que ya haya votado todo el mundo
   if (cartaId !== 'leche_cortada' && !todosRespondieron()) {
-    io.to(jugadorId).emit('error_carta', 'Debes esperar a que todos respondan antes de jugar esta carta.');
+    io.to(jugadorId).emit('error_carta', 'You must wait until everyone has answered before playing this card.');
     return false;
   }
 
@@ -373,7 +371,7 @@ function procesarJugarCarta(jugadorId, { cartaId, objetivoId, valorElegido }) {
 
   if (cartaId === 'leche_cortada') {
     if (!ultimaAccion) {
-      io.to(jugadorId).emit('error_carta', 'No hay ninguna acción reciente para anular.');
+      io.to(jugadorId).emit('error_carta', 'There is no recent action to cancel.');
       return false;
     }
     const deNombre = ultimaAccion.deNombre;
@@ -399,7 +397,7 @@ function procesarJugarCarta(jugadorId, { cartaId, objetivoId, valorElegido }) {
   if (cartaId === 'mala_leche') {
     const objetivo = jugadores[objetivoId];
     if (!objetivo || objetivo.manoCartas.length === 0) {
-      io.to(jugadorId).emit('error_carta', 'Ese jugador no tiene cartas.');
+      io.to(jugadorId).emit('error_carta', 'That player has no cards.');
       return false;
     }
     const roboIdx = Math.floor(Math.random() * objetivo.manoCartas.length);
@@ -413,7 +411,7 @@ function procesarJugarCarta(jugadorId, { cartaId, objetivoId, valorElegido }) {
     ultimaAccion = null;
     io.emit('carta_jugada', {
       jugador: jugador.nombre, jugadorColor: jugador.color,
-      cartaId, carta: 'Mala Leche',
+      cartaId, carta: 'Bad Milk',
       objetivo: objetivo.nombre, objetivoColor: objetivo.color
     });
     enviarManos();
@@ -423,12 +421,12 @@ function procesarJugarCarta(jugadorId, { cartaId, objetivoId, valorElegido }) {
 
   if (cartaId === 'manos_mantequilla' || cartaId === 'vuelta_carnero') {
     if (!preguntaActiva || preguntaActiva.revelada) {
-      io.to(jugadorId).emit('error_carta', 'No hay pregunta activa en este momento.');
+      io.to(jugadorId).emit('error_carta', 'There is no active question right now.');
       return false;
     }
     const objetivo = jugadores[objetivoId];
     if (!objetivo || preguntaActiva.respuestas[objetivoId] === undefined) {
-      io.to(jugadorId).emit('error_carta', 'Ese jugador aún no ha respondido.');
+      io.to(jugadorId).emit('error_carta', 'That player hasn\'t answered yet.');
       return false;
     }
     const anterior = preguntaActiva.respuestas[objetivoId];
@@ -448,12 +446,12 @@ function procesarJugarCarta(jugadorId, { cartaId, objetivoId, valorElegido }) {
 
   if (cartaId === 'ese_pasto') {
     if (!preguntaActiva || preguntaActiva.revelada) {
-      io.to(jugadorId).emit('error_carta', 'No hay pregunta activa en este momento.');
+      io.to(jugadorId).emit('error_carta', 'There is no active question right now.');
       return false;
     }
     const objetivo = jugadores[objetivoId];
     if (!objetivo || preguntaActiva.respuestas[jugadorId] === undefined || preguntaActiva.respuestas[objetivoId] === undefined) {
-      io.to(jugadorId).emit('error_carta', 'Ambos deben haber respondido ya para intercambiar.');
+      io.to(jugadorId).emit('error_carta', 'Both players must have already answered to swap.');
       return false;
     }
     const tmp = preguntaActiva.respuestas[jugadorId];
@@ -463,7 +461,7 @@ function procesarJugarCarta(jugadorId, { cartaId, objetivoId, valorElegido }) {
     ultimaAccion = { tipo: 'ese_pasto', deId: jugadorId, deNombre: jugador.nombre, deColor: jugador.color, objetivoId };
     io.emit('carta_jugada', {
       jugador: jugador.nombre, jugadorColor: jugador.color,
-      cartaId, carta: 'Ese Pasto Se Ve Más Verde',
+      cartaId, carta: 'The Grass Is Greener',
       objetivo: objetivo.nombre, objetivoColor: objetivo.color
     });
     enviarManos();
@@ -473,12 +471,12 @@ function procesarJugarCarta(jugadorId, { cartaId, objetivoId, valorElegido }) {
 
   if (cartaId === 'siguiendo_ganado') {
     if (!preguntaActiva || preguntaActiva.revelada) {
-      io.to(jugadorId).emit('error_carta', 'No hay pregunta activa en este momento.');
+      io.to(jugadorId).emit('error_carta', 'There is no active question right now.');
       return false;
     }
     const idsQueRespondieron = Object.keys(jugadores).filter(id => preguntaActiva.respuestas[id] !== undefined);
     if (idsQueRespondieron.length < 2) {
-      io.to(jugadorId).emit('error_carta', 'Se necesitan al menos 2 jugadores que ya hayan respondido.');
+      io.to(jugadorId).emit('error_carta', 'At least 2 players need to have answered already.');
       return false;
     }
     const mapaAnterior = { ...preguntaActiva.respuestas };
@@ -491,8 +489,8 @@ function procesarJugarCarta(jugadorId, { cartaId, objetivoId, valorElegido }) {
     ultimaAccion = { tipo: 'siguiendo_ganado', deId: jugadorId, deNombre: jugador.nombre, deColor: jugador.color, mapaAnterior };
     io.emit('carta_jugada', {
       jugador: jugador.nombre, jugadorColor: jugador.color,
-      cartaId, carta: 'Siguiendo al Ganado',
-      objetivo: 'todos'
+      cartaId, carta: 'Following the Herd',
+      objetivo: 'everyone'
     });
     enviarManos();
     emitirEstado();
@@ -501,7 +499,7 @@ function procesarJugarCarta(jugadorId, { cartaId, objetivoId, valorElegido }) {
 
   if (cartaId === 'vaca_tecnologica') {
     if (!preguntaActiva || preguntaActiva.revelada) {
-      io.to(jugadorId).emit('error_carta', 'No hay pregunta activa en este momento.');
+      io.to(jugadorId).emit('error_carta', 'There is no active question right now.');
       return false;
     }
     const anteriorPregunta = snapshotPregunta();
@@ -520,9 +518,9 @@ function procesarJugarCarta(jugadorId, { cartaId, objetivoId, valorElegido }) {
     };
     io.emit('carta_jugada', {
       jugador: jugador.nombre, jugadorColor: jugador.color,
-      cartaId, carta: 'Vaca Tecnológica',
-      objetivo: 'la pregunta',
-      detalle: `Solo ${jugador.nombre} (vaca ${jugador.color}) puede responder la nueva pregunta.`
+      cartaId, carta: 'Tech Cow',
+      objetivo: 'the question',
+      detalle: `Only ${jugador.nombre} (${jugador.color} cow) can answer the new question.`
     });
     io.emit('pregunta_cambiada', {
       categoria: p.categoria, texto: p.texto,
@@ -536,11 +534,11 @@ function procesarJugarCarta(jugadorId, { cartaId, objetivoId, valorElegido }) {
 
   if (cartaId === 'vaca_tablero') {
     if (!preguntaActiva || preguntaActiva.revelada) {
-      io.to(jugadorId).emit('error_carta', 'No hay pregunta activa en este momento.');
+      io.to(jugadorId).emit('error_carta', 'There is no active question right now.');
       return false;
     }
     if (valorElegido !== true && valorElegido !== false) {
-      io.to(jugadorId).emit('error_carta', 'Debes elegir Verdadero o Falso.');
+      io.to(jugadorId).emit('error_carta', 'You must choose True or False.');
       return false;
     }
     const anteriorCorrecta = preguntaActiva.correcta;
@@ -549,9 +547,9 @@ function procesarJugarCarta(jugadorId, { cartaId, objetivoId, valorElegido }) {
     ultimaAccion = { tipo: 'vaca_tablero', deId: jugadorId, deNombre: jugador.nombre, deColor: jugador.color, anteriorCorrecta };
     io.emit('carta_jugada', {
       jugador: jugador.nombre, jugadorColor: jugador.color,
-      cartaId, carta: 'La Vaca del Tablero',
-      objetivo: 'la respuesta correcta',
-      detalle: `Ahora la respuesta correcta es ${valorElegido ? 'Verdadero' : 'Falso'}`
+      cartaId, carta: 'The Boss Cow',
+      objetivo: 'the correct answer',
+      detalle: `The correct answer is now ${valorElegido ? 'True' : 'False'}`
     });
     enviarManos();
     emitirEstado();
@@ -565,13 +563,13 @@ function jugadaAleatoriaParaBot(botId) {
   const bot = jugadores[botId];
   if (!bot || !bot.esBot || bot.manoCartas.length === 0) return;
   if (!preguntaActiva || preguntaActiva.revelada) return;
-  if (Math.random() > 0.5) return; // la mitad de las veces el bot decide no jugar nada
+  if (Math.random() > 0.5) return;
 
   const cartaId = bot.manoCartas[Math.floor(Math.random() * bot.manoCartas.length)];
   const tipo = CARTAS_ACCION[cartaId].tipo;
 
   if (cartaId === 'leche_cortada') {
-    if (!ultimaAccion) return; // solo la juega si hay algo real que anular
+    if (!ultimaAccion) return;
     procesarJugarCarta(botId, { cartaId });
     return;
   }
@@ -579,7 +577,6 @@ function jugadaAleatoriaParaBot(botId) {
   if (cartaId === 'vaca_tecnologica') {
     const jugado = procesarJugarCarta(botId, { cartaId });
     if (jugado) {
-      // el bot necesita volver a responder porque su propia respuesta se borró
       setTimeout(() => {
         procesarRespuesta(botId, Math.random() < 0.5);
       }, 600 + Math.random() * 1000);
@@ -600,7 +597,6 @@ function jugadaAleatoriaParaBot(botId) {
     return;
   }
 
-  // siguiendo_ganado es el único tipo 'ninguno' que queda
   procesarJugarCarta(botId, { cartaId });
 }
 
@@ -615,8 +611,6 @@ function programarRespuestasBots() {
   });
 }
 
-// Se llama solo cuando ya todos respondieron. Cada bot tiene una oportunidad
-// de jugar una carta, con un pequeño retraso escalonado para que se sienta natural.
 function intentarJugadasDeBots() {
   Object.keys(jugadores).forEach(id => {
     if (!jugadores[id] || !jugadores[id].esBot) return;
@@ -625,23 +619,23 @@ function intentarJugadasDeBots() {
 }
 
 io.on('connection', (socket) => {
-  console.log('Conexión nueva:', socket.id);
+  console.log('New connection:', socket.id);
   emitirEstado();
 
   socket.on('unirse', ({ nombre, color }) => {
     if (Object.keys(jugadores).length >= MAX_JUGADORES) {
-      socket.emit('error_union', 'La partida ya tiene 5 jugadores.');
+      socket.emit('error_union', 'The game already has 5 players.');
       return;
     }
     if (!coloresLibres().includes(color)) {
-      socket.emit('error_union', 'Ese color ya fue elegido por otro jugador.');
+      socket.emit('error_union', 'That color was already picked by another player.');
       return;
     }
     const hayHostActual = Object.values(jugadores).some(j => j.esHost);
     const esPrimerJugador = !hayHostActual;
     jugadores[socket.id] = { nombre, color, esHost: esPrimerJugador, puntaje: 0, manoCartas: [] };
     robarCarta(socket.id);
-    console.log(`${nombre} se unió con la vaca ${color}${esPrimerJugador ? ' (HOST)' : ''}`);
+    console.log(`${nombre} joined as ${color} cow${esPrimerJugador ? ' (HOST)' : ''}`);
 
     socket.emit('union_exitosa', { nombre, color, esHost: esPrimerJugador });
     enviarManos();
@@ -652,19 +646,19 @@ io.on('connection', (socket) => {
     if (!esHost(socket)) return;
     if (!CATEGORIAS[catId]) return;
     if (preguntaActiva && !preguntaActiva.revelada) {
-      socket.emit('error_host', 'No puedes cambiar de categoría mientras hay una pregunta activa.');
+      socket.emit('error_host', 'You can\'t change category while a question is active.');
       return;
     }
     categoriaActual = catId;
     indicePregunta = -1;
-    console.log(`Categoría elegida: ${CATEGORIAS[catId].nombre}`);
+    console.log(`Category chosen: ${CATEGORIAS[catId].nombre}`);
     emitirEstado();
   });
 
   socket.on('lanzar_pregunta', () => {
     if (!esHost(socket) || ganadorDeclarado) return;
     if (!categoriaActual) {
-      socket.emit('error_host', 'Elige una categoría antes de lanzar una pregunta.');
+      socket.emit('error_host', 'Choose a category before launching a question.');
       return;
     }
     ultimaAccion = null;
@@ -678,12 +672,12 @@ io.on('connection', (socket) => {
   socket.on('agregar_bot', () => {
     if (!esHost(socket)) return;
     if (Object.keys(jugadores).length >= MAX_JUGADORES) {
-      socket.emit('error_host', 'La partida ya tiene 5 jugadores.');
+      socket.emit('error_host', 'The game already has 5 players.');
       return;
     }
     const libres = coloresLibres();
     if (libres.length === 0) {
-      socket.emit('error_host', 'No quedan colores de vaca disponibles.');
+      socket.emit('error_host', 'No cow colors left.');
       return;
     }
     const color = libres[0];
@@ -692,7 +686,7 @@ io.on('connection', (socket) => {
     const botId = crearIdBot();
     jugadores[botId] = { nombre: nombreDisponible, color, esHost: false, esBot: true, puntaje: 0, manoCartas: [] };
     robarCarta(botId);
-    console.log(`${nombreDisponible} (bot) se unió con la vaca ${color}`);
+    console.log(`${nombreDisponible} (bot) joined as ${color} cow`);
     emitirEstado();
   });
 
@@ -768,7 +762,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     const jugador = jugadores[socket.id];
     if (!jugador) return;
-    console.log(`${jugador.nombre} se desconectó`);
+    console.log(`${jugador.nombre} disconnected`);
     const eraHost = jugador.esHost;
     if (jugador.manoCartas.length) descarteAccion.push(...jugador.manoCartas);
     delete jugadores[socket.id];
@@ -778,7 +772,7 @@ io.on('connection', (socket) => {
       const idHumano = idsRestantes.find(id => !jugadores[id].esBot);
       if (idHumano) {
         jugadores[idHumano].esHost = true;
-        console.log(`${jugadores[idHumano].nombre} es el nuevo host`);
+        console.log(`${jugadores[idHumano].nombre} is the new host`);
         io.to(idHumano).emit('ahora_eres_host');
       }
     }
@@ -788,5 +782,5 @@ io.on('connection', (socket) => {
 
 const PORT = 3001;
 server.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });

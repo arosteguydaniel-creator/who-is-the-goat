@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>¿Quién es el más Vacán? - Multijugador</title>
+  <title>Who is the GOAT?</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
 
@@ -74,11 +74,7 @@
     #categoria-actual-visible { font-weight: 600; color: #1e2a5e; margin: 10px 0; }
 
     #panel-pregunta { display: none; margin-top: 24px; padding: 20px; background: #fffbe6; border-radius: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.15); }
-    .btn-vf { font-size: 1.2rem; padding: 14px 28px; margin: 10px; }
-    .btn-vf.verdadero { background: linear-gradient(135deg, #8ee88a, #4fc94f); color: #fff; }
-    .btn-vf.falso { background: linear-gradient(135deg, #f28e8e, #e34a4a); color: #fff; }
-    
-#botones-respuesta { position: relative; min-height: 160px; margin: 10px 0; }
+    #botones-respuesta { position: relative; min-height: 160px; margin: 10px 0; }
     .carta-voto {
       position: absolute; bottom: 0; left: 50%;
       display: flex; align-items: center; justify-content: center;
@@ -87,12 +83,10 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.2s ease;
     }
     .carta-voto:active { cursor: grabbing; }
-    .carta-voto.verdadero { transform: translateX(calc(-50% - 40px)) rotate(-8deg); z-index: 1; }
-    .carta-voto.falso { transform: translateX(calc(-50% + 40px)) rotate(8deg); z-index: 2; }
+    .carta-voto.verdadero { background: linear-gradient(135deg, #8ee88a, #4fc94f); transform: translateX(calc(-50% - 40px)) rotate(-8deg); z-index: 1; }
+    .carta-voto.falso { background: linear-gradient(135deg, #f28e8e, #e34a4a); transform: translateX(calc(-50% + 40px)) rotate(8deg); z-index: 2; }
     .carta-voto.verdadero:hover { transform: translateX(calc(-50% - 40px)) translateY(-24px) rotate(0deg) scale(1.06); z-index: 10; }
     .carta-voto.falso:hover { transform: translateX(calc(-50% + 40px)) translateY(-24px) rotate(0deg) scale(1.06); z-index: 10; }
-    .carta-voto.verdadero { background: linear-gradient(135deg, #8ee88a, #4fc94f); }
-    .carta-voto.falso { background: linear-gradient(135deg, #f28e8e, #e34a4a); }
     .carta-voto.arrastrando { opacity: 0.35; }
 
     #zona-mesa {
@@ -125,8 +119,6 @@
     #panel-cartas { margin-top: 24px; padding: 18px; background: #f3e6ff; border-radius: 20px; box-shadow: 0 6px 18px rgba(0,0,0,0.15); }
     .carta-item { display: inline-block; vertical-align: top; width: 170px; margin: 8px; padding: 10px; background: #fff; border-radius: 16px; border: 2px solid transparent; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
     .carta-item.seleccionada { border-color: #7a3fa0; background: #f8f0ff; }
-
-   
     .carta-imagen { width: 100%; height: auto; max-height: 220px; object-fit: contain; border-radius: 10px; margin-bottom: 6px; }
     .carta-nombre { font-weight: 700; margin-bottom: 4px; color: #4a2b6b; }
     .carta-desc { font-size: 0.78rem; color: #555; line-height: 1.2; margin-bottom: 6px; }
@@ -142,78 +134,106 @@
     #btn-jugar-carta { background: linear-gradient(135deg, #8ab6f5, #4d84e0); color: #fff; margin-top: 10px; display: block; width: 100%; }
     #btn-jugar-carta:disabled { background: #ddd; color: #888; cursor: not-allowed; }
 
+    #campo-central {
+      min-height: 90px; margin: 10px 0; display: flex; justify-content: center; align-items: flex-end;
+      gap: 14px; flex-wrap: wrap;
+    }
+    .jugada-campo {
+      width: 90px; text-align: center; opacity: 0; transform: translateY(20px) scale(0.8);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .jugada-campo.mostrando { opacity: 1; transform: translateY(0) scale(1); }
+    .jugada-campo.saliendo { opacity: 0; transform: translateY(-14px) scale(0.9); }
+    .jugada-campo img { width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .jugada-campo .etiqueta { font-size: 0.68rem; color: #333; background: #fff; border-radius: 8px; padding: 2px 4px; margin-top: 4px; line-height: 1.15; }
+    .jugada-campo.anulada img { filter: grayscale(1) opacity(0.5); }
+    .jugada-campo .sello-anulada { font-size: 0.65rem; color: #d92b2b; font-weight: 700; }
+
     #log-cartas { margin-top: 16px; font-size: 0.9rem; color: #444; text-align: left; background: #fff; padding: 10px 14px; border-radius: 14px; }
     #log-cartas p { margin: 4px 0; }
     .error-carta { color: #d92b2b; font-size: 0.9rem; }
 
-   #zona-reiniciar { display: none; margin-top: 40px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.6); }
+    #zona-reiniciar { display: none; margin-top: 40px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.6); }
     .btn-reiniciar { background: linear-gradient(135deg, #f7a8a8, #e34a4a); color: #fff; }
 
-#btn-musica-flotante {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: auto; height: auto; border-radius: 999px;
-      background: linear-gradient(135deg, #a78bfa, #7c5fe0);
-      color: #fff; font-size: 1.3rem; margin-top: 20px; padding: 10px 20px;
+    #reproductor-musica {
+      margin: 20px auto 0; max-width: 300px;
+      background: linear-gradient(135deg, #ffcf5c, #ff9a3d);
+      border-radius: 20px; padding: 16px; box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+      text-align: center; color: #4a2b00;
     }
-    #panel-musica {
-      display: none; margin: 12px auto 0; max-width: 280px;
-      background: #fff; border-radius: 16px; padding: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-      text-align: center;
+    #reproductor-musica .track-info { font-size: 0.9rem; font-weight: 600; margin-bottom: 12px; min-height: 2.4em; color: #4a2b00; }
+    #reproductor-musica .controles-musica { display: flex; justify-content: center; align-items: center; gap: 14px; margin-bottom: 12px; }
+    #reproductor-musica .controles-musica button {
+      background: #fff; color: #ff9a3d; border-radius: 50%; width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem; padding: 0; margin: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
-    #panel-musica .track-info { font-size: 0.85rem; color: #4a2b6b; margin-bottom: 10px; min-height: 2.4em; }
-    #panel-musica .controles-musica { display: flex; justify-content: center; gap: 8px; margin-bottom: 8px; }
-    #panel-musica button { padding: 8px 12px; margin: 0; font-size: 0.9rem; }
-    #panel-musica input[type="range"] { width: 100%; margin: 6px 0 0; }
+    #reproductor-musica #btn-musica-play { width: 52px; height: 52px; font-size: 1.3rem; }
+    .fila-volumen { display: flex; align-items: center; gap: 8px; }
+    .fila-volumen span { font-size: 1rem; }
+    #musica-volumen {
+      -webkit-appearance: none; appearance: none; flex: 1; height: 6px; border-radius: 999px;
+      background: rgba(255,255,255,0.6); outline: none;
+    }
+    #musica-volumen::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; border: 3px solid #ff9a3d; cursor: pointer;
+    }
+    #musica-volumen::-moz-range-thumb {
+      width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 3px solid #ff9a3d; cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <img src="images/VACAN_2.png" alt="Vaquita Vacán" class="mascota-vacan">
-  <h1>¿Quién es el más Vacán?</h1>
+  <img src="images/VACAN_2.png" alt="GOAT cow mascot" class="mascota-vacan">
+  <h1>Who is the GOAT?</h1>
 
   <div id="form-union">
-    <input id="input-nombre" type="text" placeholder="Tu nombre" />
+    <input id="input-nombre" type="text" placeholder="Your name" />
     <select id="select-color"></select>
-    <button id="btn-unirse">Unirse</button>
+    <button id="btn-unirse">Join</button>
     <p id="error"></p>
   </div>
 
   <p id="info-jugador"></p>
 
-  <h2>Jugadores conectados</h2>
+  <h2>Connected players</h2>
   <ul id="lista-jugadores"></ul>
 
-  <p id="categoria-actual-visible">Categoría: sin elegir todavía</p>
+  <p id="categoria-actual-visible">Category: not chosen yet</p>
 
   <div id="banner-ganador"></div>
 
   <div id="panel-host">
     <div id="selector-categoria">
       <select id="select-categoria"></select>
-      <button id="btn-elegir-categoria">Elegir categoría</button>
+      <button id="btn-elegir-categoria">Choose category</button>
       <p id="error-host" class="error-carta"></p>
     </div>
-    <button id="btn-agregar-bot">Agregar Bot 🤖</button>
-    <button id="btn-lanzar" disabled>Lanzar pregunta</button>
-    <button id="btn-revelar" disabled>Revelar respuesta</button>
+    <button id="btn-agregar-bot">Add Bot 🤖</button>
+    <button id="btn-lanzar" disabled>Launch question</button>
+    <button id="btn-revelar" disabled>Reveal answer</button>
   </div>
 
- <div id="panel-pregunta">
+  <div id="panel-pregunta">
     <p id="pregunta-categoria"></p>
     <h3 id="pregunta-texto"></h3>
 
     <div id="zona-mesa"></div>
 
     <div id="botones-respuesta">
-      <div class="carta-voto verdadero" id="btn-verdadero" draggable="true" data-valor="true">VERDADERO</div>
-      <div class="carta-voto falso" id="btn-falso" draggable="true" data-valor="false">FALSO</div>
+      <div class="carta-voto verdadero" id="btn-verdadero" draggable="true" data-valor="true">TRUE</div>
+      <div class="carta-voto falso" id="btn-falso" draggable="true" data-valor="false">FALSE</div>
     </div>
-    <p style="font-size:0.8rem;color:#555;">Arrastra tu carta a la mesa, o simplemente tócala</p>
+    <p style="font-size:0.8rem;color:#555;">Drag your card to the table, or just tap it</p>
     <p id="estado-respuesta"></p>
     <div id="resultado"></div>
   </div>
 
   <div id="panel-cartas">
-    <h3>Tus cartas de acción</h3>
+    <h3>Your action cards</h3>
+    <div id="campo-central"></div>
     <div id="mis-cartas"></div>
 
     <div id="panel-accion">
@@ -222,11 +242,11 @@
         <select id="select-objetivo"></select>
       </div>
       <div id="accion-valor" style="display:none;">
-        <button id="btn-valor-verdadero" class="valor-opcion color-verdadero">Verdadero</button>
-        <button id="btn-valor-falso" class="valor-opcion color-falso">Falso</button>
+        <button id="btn-valor-verdadero" class="valor-opcion color-verdadero">True</button>
+        <button id="btn-valor-falso" class="valor-opcion color-falso">False</button>
       </div>
-      <button id="btn-jugar-carta" disabled>Jugar carta de acción</button>
-      <button id="btn-cancelar-carta">Cancelar</button>
+      <button id="btn-jugar-carta" disabled>Play action card</button>
+      <button id="btn-cancelar-carta">Cancel</button>
     </div>
 
     <p id="error-carta" class="error-carta"></p>
@@ -234,36 +254,36 @@
   </div>
 
   <div id="zona-reiniciar">
-    <button id="btn-reiniciar" class="btn-reiniciar">Reiniciar partida</button>
+    <button id="btn-reiniciar" class="btn-reiniciar">Restart game</button>
   </div>
 
-  <button id="btn-musica-flotante">🎵</button>
-  <div id="panel-musica">
-    <div class="track-info" id="musica-info">Sin música cargada</div>
+  <div id="reproductor-musica">
+    <div class="track-info" id="musica-info">No music loaded</div>
     <div class="controles-musica">
       <button id="btn-musica-prev">⏮</button>
       <button id="btn-musica-play">▶️</button>
       <button id="btn-musica-next">⏭</button>
     </div>
-    <input type="range" id="musica-volumen" min="0" max="1" step="0.05" value="0.5">
+    <div class="fila-volumen">
+      <span>🔉</span>
+      <input type="range" id="musica-volumen" min="0" max="1" step="0.05" value="0.5">
+    </div>
   </div>
   <audio id="audio-player"></audio>
-<audio id="sonido-pregunta" src="sounds/sonido_pregunta.mp3" preload="auto"></audio>
+  <audio id="sonido-pregunta" src="sounds/sonido_pregunta.mp3" preload="auto"></audio>
   <audio id="sonido-revelar" src="sounds/sonido_revelar.mp3" preload="auto"></audio>
   <audio id="sonido-carta" src="sounds/sonido_carta.mp3" preload="auto"></audio>
+
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    // ==== Reproductor de música (opcional, independiente por jugador) ====
     const PLAYLIST = [
       { titulo: 'El Aeropuerto', artista: 'Danny Blue Jet', archivo: 'music/cancion1.mp3' },
-      { titulo: '316', artista: 'M-Katana', archivo: 'music/cancion2.mp3' },
-      { titulo: 'Latiendoamerica', artista: 'La Concuerda', archivo: 'music/cancion3.mp3' },
+      { titulo: '3.16', artista: 'M-Katana', archivo: 'music/cancion2.mp3' },
+      { titulo: 'Latiendoamérica', artista: 'La Concuerda', archivo: 'music/cancion3.mp3' },
     ];
     let indiceTrackActual = 0;
     let sonando = false;
 
-    const btnMusicaFlotante = document.getElementById('btn-musica-flotante');
-    const panelMusica = document.getElementById('panel-musica');
     const musicaInfo = document.getElementById('musica-info');
     const btnMusicaPlay = document.getElementById('btn-musica-play');
     const btnMusicaPrev = document.getElementById('btn-musica-prev');
@@ -275,7 +295,7 @@
 
     function cargarTrack(indice, autoplay) {
       if (PLAYLIST.length === 0) {
-        musicaInfo.textContent = 'No hay canciones cargadas todavía';
+        musicaInfo.textContent = 'No songs loaded yet';
         return;
       }
       indiceTrackActual = (indice + PLAYLIST.length) % PLAYLIST.length;
@@ -289,13 +309,7 @@
       }
     }
 
-    btnMusicaFlotante.addEventListener('click', () => {
-      const abierto = panelMusica.style.display === 'block';
-      panelMusica.style.display = abierto ? 'none' : 'block';
-      if (!abierto && !audioPlayer.src) {
-        cargarTrack(0, false);
-      }
-    });
+    cargarTrack(0, false); // muestra la primera canción de entrada (el navegador exige un clic antes de poder reproducir sonido)
 
     btnMusicaPlay.addEventListener('click', () => {
       if (!audioPlayer.src) cargarTrack(0, false);
@@ -318,19 +332,17 @@
     musicaVolumen.addEventListener('input', () => {
       audioPlayer.volume = parseFloat(musicaVolumen.value);
     });
-    // ==== Fin reproductor de música ====
-// ==== Sonidos de eventos del juego ====
+
     const sonidoPregunta = document.getElementById('sonido-pregunta');
     const sonidoRevelar = document.getElementById('sonido-revelar');
     const sonidoCarta = document.getElementById('sonido-carta');
 
     function reproducirSonido(elemento) {
       elemento.currentTime = 0;
-      elemento.play().catch(() => {}); // ignora el error si el navegador aún no permite audio
+      elemento.play().catch(() => {});
     }
-    // ==== Fin sonidos de eventos ====
 
-      const socket = io();
+    const socket = io();
     let miId = null;
     let soyHost = false;
     let yaUnido = false;
@@ -344,31 +356,31 @@
     let preguntaEnCurso = false;
     let categoriaActualId = null;
 
-   const CATEGORIAS_DISPONIBLES = [
-      { id: 'curiosidades', nombre: 'Curiosidades de la Historia' },
-      { id: 'ciencia', nombre: 'Ciencia y Tecnología' },
-      { id: 'arte_cultura', nombre: 'Arte y Cultura' }
+    const CATEGORIAS_DISPONIBLES = [
+      { id: 'curiosidades', nombre: 'Historical Curiosities' },
+      { id: 'ciencia', nombre: 'Science & Technology' },
+      { id: 'arte_cultura', nombre: 'Art & Culture' }
     ];
 
     const NOMBRES_CARTAS = {
-      ese_pasto: 'Ese Pasto Se Ve Más Verde',
-      siguiendo_ganado: 'Siguiendo al Ganado',
-      vaca_tecnologica: 'Vaca Tecnológica',
-      leche_cortada: 'Leche Cortada',
-      vuelta_carnero: 'Vuelta de Carnero',
-      mala_leche: 'Mala Leche',
-      manos_mantequilla: 'Manos de Mantequilla',
-      vaca_tablero: 'La Vaca del Tablero'
+      ese_pasto: 'The Grass Is Greener',
+      siguiendo_ganado: 'Following the Herd',
+      vaca_tecnologica: 'Tech Cow',
+      leche_cortada: 'Sour Milk',
+      vuelta_carnero: 'Somersault',
+      mala_leche: 'Bad Milk',
+      manos_mantequilla: 'Butter Fingers',
+      vaca_tablero: 'The Boss Cow'
     };
     const DESCRIPCIONES_CARTAS = {
-      ese_pasto: 'Intercambia tu respuesta con la de otro jugador.',
-      siguiendo_ganado: 'Todos pasan su respuesta al jugador de al lado.',
-      vaca_tecnologica: 'Cambia la pregunta; solo tú puedes responder la nueva.',
-      leche_cortada: 'Anula la última carta de acción jugada.',
-      vuelta_carnero: 'Cambia la respuesta de otro jugador a la contraria.',
-      mala_leche: 'Roba una carta de acción a otro jugador.',
-      manos_mantequilla: 'Cambia la respuesta de otro jugador al azar.',
-      vaca_tablero: 'Tú decides cuál es la respuesta correcta.'
+      ese_pasto: 'Swap your answer with another player\'s.',
+      siguiendo_ganado: 'Everyone passes their answer to the next player.',
+      vaca_tecnologica: 'Changes the question; only you can answer the new one.',
+      leche_cortada: 'Cancels the last action card played.',
+      vuelta_carnero: 'Flips another player\'s answer to the opposite.',
+      mala_leche: 'Steal an action card from another player.',
+      manos_mantequilla: 'Randomizes another player\'s answer.',
+      vaca_tablero: 'You decide what the correct answer is.'
     };
     const TIPO_CARTA = {
       ese_pasto: 'jugador',
@@ -419,10 +431,44 @@
     const btnValorFalso = document.getElementById('btn-valor-falso');
     const btnJugarCarta = document.getElementById('btn-jugar-carta');
     const btnCancelarCarta = document.getElementById('btn-cancelar-carta');
-   const errorCartaEl = document.getElementById('error-carta');
+    const errorCartaEl = document.getElementById('error-carta');
     const logCartas = document.getElementById('log-cartas');
+    const campoCentral = document.getElementById('campo-central');
+    let contadorJugadaCampo = 0;
 
-    // ==== Mesa de votación (arrastrar cartas) ====
+    function mostrarJugadaEnCampo(cartaId, jugadorNombre, jugadorColor, objetivoTexto) {
+      const idJugada = `jugada-${++contadorJugadaCampo}`;
+      const div = document.createElement('div');
+      div.className = 'jugada-campo';
+      div.id = idJugada;
+      div.innerHTML = `
+        <img src="images/${cartaId}.png" alt="${NOMBRES_CARTAS[cartaId] || cartaId}" onerror="this.style.display='none'">
+        <div class="etiqueta">${jugadorNombre} (${jugadorColor})${objetivoTexto ? ' → ' + objetivoTexto : ''}</div>
+      `;
+      campoCentral.appendChild(div);
+      requestAnimationFrame(() => div.classList.add('mostrando'));
+
+      setTimeout(() => {
+        const el = document.getElementById(idJugada);
+        if (!el) return;
+        el.classList.add('saliendo');
+        setTimeout(() => el.remove(), 400);
+      }, 4000);
+
+      return idJugada;
+    }
+
+    function marcarUltimaJugadaAnulada() {
+      const jugadas = campoCentral.querySelectorAll('.jugada-campo:not(.anulada)');
+      const ultima = jugadas[jugadas.length - 1];
+      if (!ultima) return;
+      ultima.classList.add('anulada');
+      const sello = document.createElement('div');
+      sello.className = 'sello-anulada';
+      sello.textContent = 'CANCELED!';
+      ultima.appendChild(sello);
+    }
+
     function limpiarMesa() {
       zonaMesa.innerHTML = '';
     }
@@ -438,7 +484,7 @@
     function renderMesaRevelada(resultados) {
       zonaMesa.innerHTML = resultados.map(r => {
         const clase = r.correcto ? 'correcto' : 'incorrecto';
-        const letra = r.respuesta ? 'V' : 'F';
+        const letra = r.respuesta ? 'T' : 'F';
         return `<div class="carta-mesa revelada ${clase}"><div class="dorso">${letra}</div><div class="nombre-mesa">${r.nombre}</div></div>`;
       }).join('');
     }
@@ -464,10 +510,8 @@
       if (valor === 'true') responder(true);
       else if (valor === 'false') responder(false);
     });
-    // ==== Fin mesa de votación ====
 
     selectCategoria.innerHTML = CATEGORIAS_DISPONIBLES
-
       .map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
 
     btnElegirCategoria.addEventListener('click', () => {
@@ -498,12 +542,12 @@
 
     function descripcionParaCarta(cartaId) {
       if (cartaId === 'leche_cortada' && ultimaAccionInfo) {
-        return `Anulará: "${ultimaAccionInfo.carta}" jugada por ${ultimaAccionInfo.deNombre} (vaca ${ultimaAccionInfo.deColor})`;
+        return `Will cancel: "${ultimaAccionInfo.carta}" played by ${ultimaAccionInfo.deNombre} (${ultimaAccionInfo.deColor} cow)`;
       }
       return DESCRIPCIONES_CARTAS[cartaId];
     }
 
-   function renderizarMisCartas() {
+    function renderizarMisCartas() {
       misCartasEl.innerHTML = miMano
         .map(cartaId => {
           const habilitada = tarjetaHabilitada(cartaId);
@@ -512,10 +556,10 @@
             <img class="carta-imagen" src="images/${cartaId}.png" alt="${NOMBRES_CARTAS[cartaId]}" onerror="this.style.display='none'">
             <div class="carta-nombre">${NOMBRES_CARTAS[cartaId]}</div>
             <div class="carta-desc">${descripcionParaCarta(cartaId)}</div>
-            <button class="btn-jugar-esta-carta ${habilitada ? 'habilitada' : ''}" data-carta="${cartaId}" ${habilitada ? '' : 'disabled'}>Jugar carta</button>
+            <button class="btn-jugar-esta-carta ${habilitada ? 'habilitada' : ''}" data-carta="${cartaId}" ${habilitada ? '' : 'disabled'}>Play card</button>
           </div>
         `;
-        }).join('') || '<em>No tienes cartas.</em>';
+        }).join('') || '<em>You have no cards.</em>';
 
       misCartasEl.querySelectorAll('.btn-jugar-esta-carta').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -538,6 +582,7 @@
         div.classList.toggle('seleccionada', div.dataset.carta === cartaSeleccionada);
       });
     }
+
     function seleccionarCarta(cartaId) {
       cartaSeleccionada = cartaId;
       valorSeleccionado = null;
@@ -550,11 +595,11 @@
       btnValorVerdadero.classList.remove('valor-activo', 'valor-inactiva');
       btnValorFalso.classList.remove('valor-activo', 'valor-inactiva');
 
-   if (tipo === 'jugador') {
+      if (tipo === 'jugador') {
         const otros = ultimosJugadores.filter(j => j.id !== miId);
         if (otros.length === 0) {
           selectObjetivo.innerHTML = '';
-          accionObjetivo.innerHTML = '<p style="color:#d92b2b;">No hay otros jugadores para elegir.</p>';
+          accionObjetivo.innerHTML = '<p style="color:#d92b2b;">No other players to choose from.</p>';
         } else {
           accionObjetivo.innerHTML = '<select id="select-objetivo"></select>';
           document.getElementById('select-objetivo').innerHTML = otros
@@ -564,7 +609,7 @@
       }
 
       btnJugarCarta.disabled = tipo === 'valor' || (tipo === 'jugador' && ultimosJugadores.filter(j => j.id !== miId).length === 0);
-      
+
       panelAccion.style.display = 'block';
       resaltarCartaSeleccionada();
     }
@@ -616,15 +661,15 @@
       soyHost = esHost;
       formUnion.style.display = 'none';
       infoJugador.style.display = 'block';
-      infoJugador.textContent = `Jugando como: ${nombre} (vaca ${color})${esHost ? ' 👑 host' : ''}`;
+      infoJugador.textContent = `Playing as: ${nombre} (${color} cow)${esHost ? ' 👑 host' : ''}`;
       actualizarPanelHost();
     });
 
-  socket.on('ahora_eres_host', () => {
+    socket.on('ahora_eres_host', () => {
       soyHost = true;
       actualizarPanelHost();
-      infoJugador.textContent += ' — ahora eres host 👑';
-      selectorCategoriaDiv.style.display = 'block'; // el nuevo host puede cambiar de categoría si quiere
+      infoJugador.textContent += ' — now the host 👑';
+      selectorCategoriaDiv.style.display = 'block';
     });
 
     socket.on('tu_mano', (mano) => {
@@ -640,28 +685,28 @@
       ultimosJugadores = jugadores;
       ultimaAccionInfo = infoAccion || null;
       categoriaActualId = categoriaInfo ? categoriaInfo.id : null;
-      categoriaActualVisible.textContent = categoriaInfo ? `Categoría: ${categoriaInfo.nombre}` : 'Categoría: sin elegir todavía';
+      categoriaActualVisible.textContent = categoriaInfo ? `Category: ${categoriaInfo.nombre}` : 'Category: not chosen yet';
       if (categoriaInfo) selectCategoria.value = categoriaInfo.id;
       selectorCategoriaDiv.style.display = categoriaActualId ? 'none' : 'block';
 
-     listaJugadores.innerHTML = jugadores
-        .map(j => `<li>${j.esHost ? '👑 ' : (j.esBot ? '🤖 ' : '🐄 ')}${j.nombre} — vaca ${j.color}${j.esHost ? ' (host)' : ''}${j.esBot ? ' (bot)' : ''} — <strong>${j.puntaje} pts</strong> — 🎴 ${j.cartasEnMano}</li>`)
+      listaJugadores.innerHTML = jugadores
+        .map(j => `<li>${j.esHost ? '👑 ' : (j.esBot ? '🤖 ' : '🐄 ')}${j.nombre} — ${j.color} cow${j.esHost ? ' (host)' : ''}${j.esBot ? ' (bot)' : ''} — <strong>${j.puntaje} pts</strong> — 🎴 ${j.cartasEnMano}</li>`)
         .join('');
 
       selectColor.innerHTML = coloresLibres
         .map(c => `<option value="${c}">${c}</option>`)
         .join('');
 
-     if (!yaUnido) {
+      if (!yaUnido) {
         btnUnirse.disabled = cupoLleno || coloresLibres.length === 0;
-        if (cupoLleno) errorEl.textContent = 'La partida ya está llena (5 jugadores).';
+        if (cupoLleno) errorEl.textContent = 'The game already has 5 players.';
       }
       btnAgregarBot.style.display = puedeAgregarBot ? 'inline-block' : 'none';
       btnAgregarBot.disabled = cupoLleno;
 
       if (ganador) {
         bannerGanador.style.display = 'block';
-        bannerGanador.innerHTML = `🏆 ¡${ganador.nombre} (vaca ${ganador.color}) es el más Vacán con ${ganador.puntaje} puntos!`;
+        bannerGanador.innerHTML = `🏆 ${ganador.nombre} (${ganador.color} cow) is the GOAT with ${ganador.puntaje} points!`;
         btnLanzar.disabled = true;
       } else {
         bannerGanador.style.display = 'none';
@@ -682,22 +727,25 @@
     socket.on('carta_jugada', ({ jugador, jugadorColor, cartaId, carta, objetivo, objetivoColor, detalle }) => {
       reproducirSonido(sonidoCarta);
       const desc = DESCRIPCIONES_CARTAS[cartaId] || '';
-      const objetivoTexto = objetivoColor ? `${objetivo} (vaca ${objetivoColor})` : objetivo;
+      const objetivoTexto = objetivoColor ? `${objetivo} (${objetivoColor} cow)` : objetivo;
       const notaFinal = detalle || desc;
-      agregarLog(`🎴 ${jugador} (vaca ${jugadorColor}) jugó "${carta}" sobre ${objetivoTexto} — ${notaFinal}`);
+      agregarLog(`🎴 ${jugador} (${jugadorColor} cow) played "${carta}" on ${objetivoTexto} — ${notaFinal}`);
+      mostrarJugadaEnCampo(cartaId, jugador, jugadorColor, objetivoTexto);
     });
 
     socket.on('accion_anulada', ({ por, porColor, deQuien, deQuienColor }) => {
-      agregarLog(`🥛 ${por} (vaca ${porColor}) anuló la acción de ${deQuien} (vaca ${deQuienColor}) con Leche Cortada`);
+      agregarLog(`🥛 ${por} (${porColor} cow) canceled ${deQuien}'s (${deQuienColor} cow) action with Sour Milk`);
+      marcarUltimaJugadaAnulada();
+      mostrarJugadaEnCampo('leche_cortada', por, porColor, `canceled ${deQuien}`);
     });
 
-   socket.on('pregunta_cambiada', ({ categoria, texto, casterId, casterNombre, casterColor }) => {
+    socket.on('pregunta_cambiada', ({ categoria, texto, casterId, casterNombre, casterColor }) => {
       limpiarMesa();
-      preguntaCategoria.textContent = `Categoría: ${categoria}`;
+      preguntaCategoria.textContent = `Category: ${categoria}`;
       preguntaTexto.textContent = texto;
       if (miId !== casterId) {
         botonesRespuesta.style.display = 'none';
-        estadoRespuesta.textContent = `⚡ La pregunta cambió (Vaca Tecnológica de ${casterNombre}, vaca ${casterColor}). Solo ${casterNombre} puede responder ahora.`;
+        estadoRespuesta.textContent = `⚡ The question changed (Tech Cow by ${casterNombre}, ${casterColor} cow). Only ${casterNombre} can answer now.`;
       }
       puedeJugarCartas = false;
       renderizarMisCartas();
@@ -706,22 +754,22 @@
     socket.on('puedes_responder_de_nuevo', () => {
       yaRespondi = false;
       botonesRespuesta.style.display = 'block';
-      estadoRespuesta.textContent = 'La pregunta cambió — responde de nuevo.';
+      estadoRespuesta.textContent = 'The question changed — answer again.';
       resultadoEl.innerHTML = '';
     });
 
     socket.on('pregunta_restaurada', ({ categoria, texto, yaRespondiste }) => {
-      preguntaCategoria.textContent = `Categoría: ${categoria}`;
+      preguntaCategoria.textContent = `Category: ${categoria}`;
       preguntaTexto.textContent = texto;
 
       if (yaRespondiste) {
         yaRespondi = true;
         botonesRespuesta.style.display = 'none';
-        estadoRespuesta.textContent = 'La pregunta cambió. Tu respuesta ya estaba guardada.';
+        estadoRespuesta.textContent = 'The question is back to the original. Your answer was already saved.';
       } else {
         yaRespondi = false;
         botonesRespuesta.style.display = 'block';
-        estadoRespuesta.textContent = 'La pregunta cambió — puedes responder.';
+        estadoRespuesta.textContent = 'The question is back to the original — you can answer.';
       }
     });
 
@@ -729,7 +777,7 @@
       const nombre = inputNombre.value.trim();
       const color = selectColor.value;
       if (!nombre) {
-        errorEl.textContent = 'Escribe tu nombre primero.';
+        errorEl.textContent = 'Type your name first.';
         return;
       }
       errorEl.textContent = '';
@@ -764,12 +812,12 @@
       logCartas.innerHTML = '';
       renderizarMisCartas();
     });
-    
-   socket.on('pregunta_lanzada', ({ categoria, texto }) => {
+
+    socket.on('pregunta_lanzada', ({ categoria, texto }) => {
       reproducirSonido(sonidoPregunta);
       limpiarMesa();
       panelPregunta.style.display = 'block';
-      preguntaCategoria.textContent = `Categoría: ${categoria}`;
+      preguntaCategoria.textContent = `Category: ${categoria}`;
       preguntaTexto.textContent = texto;
       estadoRespuesta.textContent = '';
       resultadoEl.innerHTML = '';
@@ -790,12 +838,12 @@
       yaRespondi = true;
       socket.emit('responder', { respuesta });
       botonesRespuesta.style.display = 'none';
-      estadoRespuesta.textContent = 'Respuesta enviada. Esperando a los demás...';
+      estadoRespuesta.textContent = 'Answer sent. Waiting for the others...';
     }
 
-   socket.on('conteo_respuestas', ({ respondieron, total, respondieronIds }) => {
+    socket.on('conteo_respuestas', ({ respondieron, total, respondieronIds }) => {
       if (soyHost) {
-        estadoRespuesta.textContent = `${respondieron} de ${total} jugadores han respondido.`;
+        estadoRespuesta.textContent = `${respondieron} of ${total} players have answered.`;
         btnRevelar.disabled = !(total > 0 && respondieron === total);
       }
       puedeJugarCartas = total > 0 && respondieron === total;
@@ -803,7 +851,7 @@
       renderizarMisCartas();
     });
 
-   socket.on('resultado_revelado', ({ correcta, resultados }) => {
+    socket.on('resultado_revelado', ({ correcta, resultados }) => {
       reproducirSonido(sonidoRevelar);
       renderMesaRevelada(resultados);
       puedeJugarCartas = false;
@@ -811,12 +859,12 @@
       preguntaEnCurso = false;
       renderizarMisCartas();
       estadoRespuesta.textContent = '';
-      const textoCorrecta = correcta ? 'VERDADERO' : 'FALSO';
-      let html = `<p><strong>Respuesta correcta: ${textoCorrecta}</strong></p><ul>`;
+      const textoCorrecta = correcta ? 'TRUE' : 'FALSE';
+      let html = `<p><strong>Correct answer: ${textoCorrecta}</strong></p><ul>`;
       resultados.forEach(r => {
         const clase = r.correcto ? 'resultado-correcto' : 'resultado-incorrecto';
-        const suRespuesta = r.respuesta ? 'Verdadero' : 'Falso';
-        html += `<li class="${clase}">${r.nombre} (${r.color}) respondió ${suRespuesta} ${r.correcto ? '✅' : '❌ (roba carta)'}</li>`;
+        const suRespuesta = r.respuesta ? 'True' : 'False';
+        html += `<li class="${clase}">${r.nombre} (${r.color}) answered ${suRespuesta} ${r.correcto ? '✅' : '❌ (draws a card)'}</li>`;
       });
       html += '</ul>';
       resultadoEl.innerHTML = html;
